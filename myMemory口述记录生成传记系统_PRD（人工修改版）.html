@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>myMemory口述记录生成传记系统（网页微缩版）PRD（人工修改版）</title>
+<style>
+@page { size: A4; margin: 2.2cm 2.4cm 2.2cm 2.4cm; }
+:root { --ink:#243447; --muted:#617083; --blue:#285f8f; --line:#d8e1ea; --soft:#f3f7fa; --accent:#eaf2f8; }
+* { box-sizing:border-box; }
+body { font-family:"Microsoft YaHei","SimSun",sans-serif; color:var(--ink); font-size:10.5pt; line-height:1.75; margin:0; }
+.cover { min-height:22cm; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; page-break-after:always; }
+.cover .eyebrow { color:var(--blue); font-size:12pt; letter-spacing:2px; margin-bottom:22px; }
+.cover h1 { font-size:27pt; line-height:1.35; margin:0 0 18px; color:#193b59; }
+.cover .subtitle { font-size:15pt; color:var(--muted); margin-bottom:70px; }
+.cover .meta { color:var(--muted); font-size:10.5pt; }
+.doc-header { border-bottom:1px solid var(--line); color:var(--muted); font-size:9pt; padding-bottom:7px; margin-bottom:24px; }
+.doc-footer { border-top:1px solid var(--line); color:var(--muted); font-size:9pt; padding-top:7px; margin-top:24px; text-align:center; }
+h1 { color:#193b59; font-size:20pt; margin:26px 0 13px; padding-bottom:6px; border-bottom:2px solid var(--blue); page-break-before:always; }
+h1:first-of-type { page-break-before:auto; }
+h2 { color:var(--blue); font-size:15pt; margin:22px 0 8px; }
+h3 { color:#3d617f; font-size:12pt; margin:16px 0 5px; }
+p { margin:7px 0; }
+blockquote { margin:14px 0; padding:10px 16px; background:var(--accent); border-left:4px solid var(--blue); color:#35516b; }
+ul, ol { margin:6px 0 10px 24px; padding-left:18px; }
+li { margin:3px 0; }
+strong { color:#183d5d; }
+table { width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:9.5pt; page-break-inside:avoid; }
+th { background:#eaf2f8; color:#244a69; font-weight:bold; }
+th, td { border:1px solid var(--line); padding:7px 8px; vertical-align:top; }
+tr:nth-child(even) td { background:#fbfcfd; }
+code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding:1px 4px; color:#814c22; }
+.note { background:#fff9e8; border-left:4px solid #d6a72c; padding:9px 13px; margin:12px 0; }
+.small { color:var(--muted); font-size:9pt; }
+</style>
+</head>
+<body>
+<section class="cover" role="cover">
+  <div class="eyebrow">产品需求文档｜人工修改版</div>
+  <h1>myMemory<br>口述记录生成传记系统</h1>
+  <div class="subtitle">网页微缩版 PRD</div>
+  <div class="meta">版本：人工修改版　|　基于原始 PRD 小幅完善</div>
+</section>
+<section role="body" data-page-restart="1">
+<header class="doc-header">myMemory 口述记录生成传记系统（网页微缩版）｜PRD（人工修改版）</header>
+<h1>1. 产品概述</h1>
+<h2>1.1 产品名称</h2>
+<p>myMemory 口述记录生成传记系统（网页微缩版）</p>
+<h2>1.2 产品定位</h2>
+<p>面向中老年用户，提供一条简单、清晰、低学习成本的个人记忆记录流程：</p>
+<blockquote>录入口述素材 → 语音转文字 → AI 润色生成传记初稿 → 用户在线编辑 → 导出文档</blockquote>
+<h2>1.3 产品目标</h2>
+<p>用户无需学习复杂的文字编辑工具，即可将个人经历、家庭故事、成长记忆等口述内容，整理为一篇结构基本完整、语言通顺的传记初稿，并导出保存。产品优先保证录音、转写、润色、编辑和导出的连续体验，同时允许用户分阶段补充同一主题的口述内容。</p>
+<h2>1.4 目标用户</h2>
+<ul><li><strong>主要用户：</strong>习惯口述表达、不熟悉电脑操作的中老年口述记录者；</li><li><strong>协助用户：</strong>需要帮助父母完成授权、录音和文字校对的子女或照护者；</li><li><strong>非主要用户：</strong>专业传记编辑、机构采集人员和多人家庭协作者。</li></ul>
+
+<h1>2. 功能详细描述</h1>
+<p>本版本以核心闭环为主，并在不显著增加使用复杂度的前提下，适当补充记录管理、分段口述、隐私提示和失败恢复能力。</p>
+<h2>2.1 创建口述记录</h2>
+<p>用户进入系统后，可以新建一条口述记录，并填写一个简单标题，例如“我的童年”“南京求学经历”“我们的家庭故事”。</p>
+<h3>最小功能范围</h3>
+<ul><li>新建口述记录；</li><li>填写或修改记录标题；</li><li>自动生成记录创建时间；</li><li>进入该记录的口述录入页面；</li><li>展示当前记录状态，例如“未录入”“转写中”“待编辑”“已完成”；</li><li>支持删除不再需要的记录，删除前必须二次确认。</li></ul>
+<h3>不包含</h3>
+<ul><li>复杂分类；</li><li>标签体系；</li><li>文件夹管理；</li><li>多人共享记录。</li></ul>
+<h2>2.2 录入口述素材</h2>
+<p>用户通过网页端麦克风录制口述内容，也可以选择上传已有音频文件。</p>
+<h3>最小功能范围</h3>
+<ul><li>请求并获得浏览器麦克风权限；</li><li>开始、暂停、继续和结束录音；</li><li>播放、重新录制或确认当前音频；</li><li>上传常见音频文件作为备用录入方式；</li><li>显示录音时长和当前录音状态；</li><li>允许在同一主题下追加新的口述片段，并将多段内容合并到当前传记初稿中。</li></ul>
+<h3>录入方式优先级</h3>
+<p>语音录入为首选方式，音频文件上传为备用方式。</p>
+<h3>录入限制</h3>
+<ul><li>单段口述建议控制在合理时长内；</li><li>单段音频最长暂定为 30 分钟；</li><li>同一主题可以包含多段音频，系统按录入顺序排列；</li><li>超出单段时长时，通过文字提示用户结束当前片段并继续追加。</li></ul>
+<h2>2.3 语音转文字并生成传记初稿</h2>
+<p>系统将用户确认的音频转换为文字，并通过 AI 对文字进行基础整理和润色，生成传记初稿。</p>
+<h3>最小功能范围</h3>
+<ul><li>对音频进行语音识别并展示转写进度；</li><li>生成原始转写文字；</li><li>修正明显错别字、删除明显口头重复、调整语句和段落结构；</li><li>生成传记初稿；</li><li>明确区分“原始转写文本”和“AI 润色文本”；</li><li>提示用户核对 AI 生成内容。</li></ul>
+<h3>AI 润色要求</h3>
+<ul><li>保留用户原本的事实、人物、时间和情感表达；</li><li>不主动虚构经历、人物、地点或事件；</li><li>无法确定的内容尽量保留原意，不擅自补充；</li><li>不新增原始口述中不存在的人物、时间、地点和事件；</li><li>对疑似识别错误或听不清的内容，保留原文或标记为待核对，不自行编造；</li><li>AI 只调整表达和结构，不改变故事事实关系。</li></ul>
+<h2>2.4 在线编辑传记初稿</h2>
+<p>用户可以在网页中查看并修改 AI 生成的传记初稿。</p>
+<h3>最小功能范围</h3>
+<ul><li>查看并修改传记标题和正文；</li><li>保存当前编辑结果；</li><li>显示保存成功或失败提示；</li><li>离开页面前提示未保存内容。</li></ul>
+<h3>编辑范围</h3>
+<p>MVP 仅支持普通文本编辑，不提供复杂排版能力。允许用户修改、删除、增加文字和调整简单段落；不提供字体、颜色、字号、图片、表格等富文本功能。</p>
+<h2>2.5 导出传记文档</h2>
+<p>用户完成编辑后，可以将传记正文导出为文档文件。</p>
+<h3>最小功能范围</h3>
+<ul><li>导出当前传记标题和正文；</li><li>生成可下载的文档文件；</li><li>使用标题、正文、创建时间等基础信息组织文档；</li><li>导出前提示当前内容是否已保存；</li><li>导出完成后显示明确的下载成功提示。</li></ul>
+<h3>MVP 导出形式</h3>
+<p>优先支持一种通用文档格式，例如 <code>.docx</code> 或 <code>.txt</code>，具体格式在技术方案阶段确定。</p>
+<div class="note"><strong>范围提醒：</strong>不包含印刷排版、书籍装帧、出版文件制作和线下打印服务对接。</div>
+
+<h1>3. 业务边界</h1>
+<h2>3.1 产品要做什么</h2>
+<ol><li>帮助中老年用户通过语音方式记录个人经历和家庭故事。</li><li>将口述音频转换为可阅读、可编辑的文字。</li><li>通过 AI 对转写文字进行基础润色，生成传记初稿。</li><li>支持用户在线修改传记标题和正文。</li><li>支持将完成的传记内容导出为文档文件。</li></ol>
+<h2>3.2 产品不做什么</h2>
+<ol><li><strong>不支持机构账号。</strong>不提供学校、社区、养老机构、文化机构等组织账号体系。</li><li><strong>不提供会员付费。</strong>不包含会员等级、订阅、充值、支付或付费内容。</li><li><strong>不支持多人家庭协作。</strong>不提供多人同时编辑、家庭成员权限管理或协作空间。</li><li><strong>不提供印刷对接。</strong>不对接打印店、出版社、装订服务或实体书制作服务。</li><li><strong>不做非遗或村史专项采集。</strong>只面向个人记忆和个人传记记录。</li><li><strong>不支持多语言。</strong>MVP 仅支持中文普通话语音识别和中文文本处理。</li><li><strong>不支持评论社交。</strong>不提供评论、点赞、关注、动态分享、社区互动或公开发布。</li><li><strong>不支持历史版本对比。</strong>不提供版本差异查看、版本恢复或修改轨迹对比。</li><li><strong>不提供富文本编辑。</strong>不支持字体、字号、颜色、图片、表格和复杂排版。</li><li><strong>不提供云同步。</strong>不支持跨设备自动同步、网盘同步或云端多端数据保持一致。</li><li><strong>不提供专业传记代写服务。</strong>AI 只生成辅助性初稿。</li><li><strong>不保证 AI 内容完全准确。</strong>用户需自行核对人物、时间、地点、事件等事实。</li><li><strong>不提供公开内容发布。</strong>传记内容默认仅供用户本人使用。</li><li><strong>不处理复杂音视频素材。</strong>不支持视频剪辑、照片编排或背景音乐制作。</li></ol>
+
+<h1>4. 用户使用场景</h1>
+<h2>4.1 场景一：老人独自在家录制人生经历</h2>
+<h3>用户动机</h3><p>老人希望把童年、工作经历和家庭故事记录下来，但不擅长打字，也不会使用复杂软件。</p>
+<h3>操作步骤</h3><ol><li>打开 myMemory 网页；</li><li>点击“新建口述记录”，输入标题；</li><li>点击“开始录音”并讲述经历；</li><li>结束录音后播放确认；</li><li>点击“开始转写”，等待文字和 AI 初稿生成；</li><li>阅读、修改并导出传记初稿。</li></ol>
+<h3>期望结果</h3><p>老人不需要大量打字，就能将口述内容整理成结构清晰、语言通顺的文字并保存为文档。</p>
+<h2>4.2 场景二：子女协助老人首次使用</h2>
+<h3>用户动机</h3><p>老人想记录人生经历，但第一次使用网页工具时不熟悉麦克风授权、录音和转写流程，需要子女协助。</p>
+<h3>操作步骤</h3><ol><li>子女陪同打开系统并协助完成麦克风授权；</li><li>帮助老人新建记录并填写标题；</li><li>老人进行口述，子女确认录音是否清晰；</li><li>开始转写并生成原始文本和 AI 润色初稿；</li><li>老人确认事实内容，子女协助修改文字；</li><li>导出最终文档。</li></ol>
+<h3>期望结果</h3><p>老人负责讲述和确认内容，子女负责操作辅助，共同完成一份个人传记初稿。</p>
+<h2>4.3 场景三：老人分多次记录同一主题</h2>
+<h3>用户动机</h3><p>老人一次无法讲完完整故事，希望分多次录制童年、工作经历和家庭生活。</p>
+<h3>操作步骤</h3><ol><li>新建主题记录，例如“我的一生”；</li><li>分次录制不同阶段的经历；</li><li>每次确认音频并完成转写和润色；</li><li>再次进入记录，继续补充内容；</li><li>统一检查标题和正文后导出完整文档。</li></ol>
+<h3>期望结果</h3><p>用户能够分阶段完成内容积累，最终形成一份相对完整的个人记忆记录。</p>
+
+<h1>5. 核心数据结构</h1>
+<table><thead><tr><th>字段名</th><th>数据类型</th><th>说明</th></tr></thead><tbody>
+<tr><td><code>story_id</code></td><td>字符串 / UUID</td><td>口述记录的唯一标识，用于区分不同传记记录</td></tr>
+<tr><td><code>title</code></td><td>字符串</td><td>口述记录或传记的标题</td></tr>
+<tr><td><code>audio_url</code></td><td>字符串</td><td>音频文件的访问地址或本地临时文件地址</td></tr>
+<tr><td><code>audio_duration</code></td><td>整数</td><td>音频时长，单位为秒</td></tr>
+<tr><td><code>audio_status</code></td><td>枚举</td><td>音频状态，如“未录音”“录音完成”“已确认”“录音失败”</td></tr>
+<tr><td><code>transcribed_text</code></td><td>长文本</td><td>语音识别生成的原始转写文本</td></tr>
+<tr><td><code>transcription_status</code></td><td>枚举</td><td>转写状态，如“未开始”“处理中”“成功”“失败”</td></tr>
+<tr><td><code>polished_text</code></td><td>长文本</td><td>AI 润色后生成的传记初稿</td></tr>
+<tr><td><code>editing_status</code></td><td>枚举</td><td>编辑状态，如“待编辑”“编辑中”“已完成”</td></tr>
+<tr><td><code>export_status</code></td><td>枚举</td><td>导出状态，如“未导出”“导出中”“导出成功”“导出失败”</td></tr>
+<tr><td><code>created_at</code></td><td>日期时间</td><td>记录首次创建时间</td></tr>
+<tr><td><code>updated_at</code></td><td>日期时间</td><td>记录最后一次修改时间</td></tr>
+<tr><td><code>last_saved_at</code></td><td>日期时间</td><td>最近一次保存正文或标题的时间</td></tr>
+</tbody></table>
+<h2>5.1 数据处理原则</h2>
+<ol><li>原始转写文本和 AI 润色文本必须分开保存。</li><li>用户在线编辑后的内容以最终编辑结果为准。</li><li>AI 生成内容不能覆盖原始转写文本。</li><li>页面需要明确提示用户核对 AI 生成内容。</li><li>MVP 不建立历史版本记录，<code>updated_at</code> 只表示最近修改时间。</li><li>由于产品不提供云同步，数据保存范围应在技术方案中明确。</li></ol>
+<h2>5.2 数据保存与隐私说明</h2>
+<ul><li>产品需要明确提示用户：当前版本的记录默认保存在当前设备和当前浏览器中，不提供跨设备云同步。</li><li>如语音转写或 AI 润色需要调用外部服务，应在操作前以文字提示用户，并说明音频或文本可能被上传处理。</li><li>用户应可以删除当前记录；删除操作应同时清理关联音频、原始转写文本和润色文本。</li><li>用户导出文档后，可以根据需要清理浏览器中的本地记录。</li></ul>
+
+<h1>6. 页面交互逻辑</h1>
+<h2>6.1 首页 / 记录列表页</h2>
+<h3>用户操作路径</h3><ol><li>进入首页，查看已有记录列表；</li><li>点击“新建口述记录”；</li><li>输入记录标题；</li><li>点击“开始记录”；</li><li>进入口述录入页面。</li></ol>
+<h3>交互要求</h3><ul><li>每页只设置一个主要操作按钮；</li><li>空记录列表显示“还没有口述记录，可以先创建一条记录”；</li><li>点击新建后必须出现明确文字提示或页面变化。</li></ul>
+<h2>6.2 新建记录页</h2>
+<h3>用户操作路径</h3><ol><li>输入记录标题；</li><li>点击“开始录音”；</li><li>系统创建 <code>story_id</code>，保存标题和 <code>created_at</code>；</li><li>进入录音页面。</li></ol>
+<h3>交互要求</h3><ul><li>标题输入框字体不小于 16px；</li><li>标题为空时提示“请先填写记录标题”；</li><li>创建成功后提示“记录已创建，接下来可以开始录音”；</li><li>按钮尺寸不小于 48px。</li></ul>
+<h2>6.3 录音页面</h2>
+<h3>用户操作路径</h3><ol><li>点击“开始录音”并授权麦克风；</li><li>开始口述，页面显示“正在录音”和时长；</li><li>可暂停、继续或结束录音；</li><li>结束后播放录音检查内容；</li><li>选择“重新录制”或“确认录音”；</li><li>确认后进入转写页面。</li></ol>
+<h3>备用路径：上传音频</h3><ol><li>点击“上传音频”；</li><li>选择本地音频文件；</li><li>系统检查格式和时长；</li><li>通过后显示文件名和时长；</li><li>点击“确认音频”进入转写页面。</li></ol>
+<h3>必须提供的反馈</h3><ul><li>未授权：“未获得麦克风权限，请允许浏览器使用麦克风后重试”；</li><li>开始：“正在录音，请开始讲述”；</li><li>暂停：“录音已暂停”；</li><li>结束：“录音已结束，请播放确认内容”；</li><li>保存：“录音已保存，可以开始转写”；</li><li>格式错误：“暂不支持该音频格式，请重新选择”。</li></ul>
+<h2>6.4 转写与 AI 初稿页面</h2>
+<h3>用户操作路径</h3><ol><li>点击“开始转写”；</li><li>显示“正在识别语音”；</li><li>转写完成后展示原始转写文本；</li><li>点击“生成传记初稿”；</li><li>显示“AI 正在整理内容”；</li><li>展示 AI 润色文本并提示核对事实；</li><li>点击“进入编辑”。</li></ol>
+<h3>异常反馈</h3><ul><li>转写失败：“语音转写失败，请检查音频后重试”；</li><li>结果为空：“未识别到有效内容，请重新录音或上传更清晰的音频”；</li><li>AI 失败：“传记初稿生成失败，可以稍后重试”；</li><li>网络中断：保留当前页面状态并显示明确错误提示。</li></ul>
+<h2>6.5 在线编辑页面</h2>
+<h3>用户操作路径</h3><ol><li>查看当前标题和正文；</li><li>修改标题或正文；</li><li>点击“保存内容”；</li><li>显示保存成功提示；</li><li>点击“导出文档”进入导出流程。</li></ol>
+<h3>交互要求</h3><ul><li>编辑区域字体不小于 16px；</li><li>使用普通文本编辑区域，不提供富文本工具栏；</li><li>离开页面时若有未保存内容，提示“当前内容尚未保存，是否保存后离开？”；</li><li>保存成功提示“内容已保存”，失败提示“保存失败，请稍后重试”。</li></ul>
+<h2>6.6 导出页面或导出确认弹窗</h2>
+<h3>用户操作路径</h3><ol><li>点击“导出文档”；</li><li>检查标题、正文和未保存修改；</li><li>如有未保存内容，提示先保存；</li><li>用户确认导出；</li><li>生成文件并开始下载；</li><li>显示导出结果。</li></ol>
+<h3>异常反馈</h3><ul><li>标题为空：“请先填写传记标题”；</li><li>正文为空：“当前没有可导出的传记内容”；</li><li>有未保存内容：“请先保存当前修改，再导出文档”；</li><li>导出失败：“文档导出失败，请稍后重试”。</li></ul>
+
+<h1>7. 统一交互设计要求</h1>
+<ol><li><strong>按钮尺寸不小于 48px。</strong>重点操作按钮应保证中老年用户容易点击。</li><li><strong>页面文字字号不小于 16px。</strong>重要提示、状态信息和错误信息不能使用过小字体。</li><li><strong>每页只设置一个主要操作按钮。</strong>主要按钮应对应当前页面最重要的下一步动作。</li><li><strong>语音输入作为首选录入方式。</strong>“开始录音”应比“上传音频”等备用入口更加醒目。</li><li><strong>所有操作反馈必须有明确的文字提示。</strong>不得只通过颜色、图标或动画表示成功、失败和处理中状态。</li><li><strong>尽量减少同时出现的选择项。</strong>每个页面只展示完成当前步骤所必需的功能。</li><li><strong>涉及 AI 生成的内容必须提醒用户核对。</strong>尤其是人物、时间、地点和事件等事实信息。</li><li><strong>危险或不可逆操作必须二次确认。</strong>例如重新录制、放弃未保存内容等操作。</li><li><strong>系统状态必须可理解。</strong>统一使用“未开始、处理中、成功、失败、待确认”等文字状态。</li><li><strong>页面操作路径应保持单向清晰。</strong>用户应按照“创建记录—录音—转写—编辑—导出”的顺序完成核心任务。</li></ol>
+<h1>8. 版本说明与验收标准</h1><h2>8.1 本次人工修改说明</h2><p>本版本是在原始 PRD 草稿基础上的人工修改版，保留原有产品定位、章节结构和核心流程，仅对记录管理、多段口述、用户角色、AI 约束、隐私提示、失败恢复和验收标准进行了适度补充。</p><h2>8.2 初步验收标准</h2><ol><li>用户能够新建记录并完成一次或多次口述录入。</li><li>每段录音均能显示录音状态和时长，并支持播放确认。</li><li>系统能够保留原始转写文本，并生成可编辑的 AI 传记初稿。</li><li>AI 初稿不应凭空新增人物、时间、地点或事件，用户可以人工核对和修改。</li><li>用户可以保存标题和正文，并在离开页面前收到未保存提示。</li><li>用户可以删除不需要的记录，删除前有明确的二次确认。</li><li>用户可以成功导出包含标题和正文的文档。</li><li>录音、转写、AI 生成、保存和导出失败时，已有内容不会被无提示覆盖或丢失。</li></ol><footer class="doc-footer">myMemory PRD（人工修改版）｜基于原始草稿小幅完善</footer>
+</section>
+</body>
+</html>
