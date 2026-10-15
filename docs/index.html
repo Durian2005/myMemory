@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>myMemory 口述记录生成传记系统 · 项目文档</title>
+<style>
+:root{
+  --primary:#96604B; --primary-hover:#8A5A45;
+  --text:#3D332C; --muted:#6E5F54; --border:#E3D8CC;
+  --bg:#FDFAF5; --bg-subtle:#F7F1E8; --bg-hover:#EFE4D6;
+  --link:#8A5A45; --ok-bg:#E7EBD9; --ok-fg:#4F5C2C;
+  --r-sm:8px; --r-md:12px; --shadow:0 1px 2px rgba(61,51,44,.06);
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg-subtle);color:var(--text);
+  font-family:-apple-system,"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+  font-size:17px;line-height:1.8;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:960px;margin:0 auto;padding:56px 24px 72px;}
+a{color:var(--link);}
+.hero h1{font-size:36px;font-weight:700;margin:0 0 10px;line-height:1.35;}
+.hero .sub{font-size:18px;color:var(--muted);margin:0 0 20px;}
+.hero .flow{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:18px 24px;box-shadow:var(--shadow);font-size:17px;color:var(--muted);}
+.hero .flow b{color:var(--text);font-weight:600;}
+h2{font-size:22px;font-weight:700;margin:44px 0 16px;}
+.card{display:block;text-decoration:none;color:inherit;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:20px 24px;box-shadow:var(--shadow);margin-bottom:12px;}
+.card:hover{background:var(--bg-hover);}
+.card .t{font-size:19px;font-weight:600;margin:0 0 4px;}
+.card .d{font-size:16px;color:var(--muted);margin:0;}
+.tag{display:inline-block;font-size:15px;border-radius:999px;padding:2px 12px;
+  background:var(--ok-bg);color:var(--ok-fg);font-weight:500;margin-left:10px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;}
+.grid .card{margin-bottom:0;}
+.note{background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--primary);
+  border-radius:var(--r-sm);padding:16px 20px;font-size:16px;color:var(--muted);margin-top:20px;}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--border);
+  font-size:15px;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>myMemory<br>口述记录生成传记系统</h1>
+    <p class="sub">网页微缩版 · 项目文档与界面稿总览</p>
+    <div class="flow">
+      <b>录入口述素材</b> → <b>语音转文字</b> → <b>AI 润色生成传记初稿</b> → <b>在线编辑</b> → <b>导出 Word 文档</b>
+    </div>
+  </div>
+
+  <h2>界面稿</h2>
+  <div class="grid">
+    <a class="card" href="04-UI设计规范/高保真/hifi-P1-记录列表.html">
+      <p class="t">P1 首页 / 记录列表 <span class="tag">高保真</span></p>
+      <p class="d">记录卡片列表与新建入口</p>
+    </a>
+    <a class="card" href="04-UI设计规范/高保真/hifi-P2-新建记录.html">
+      <p class="t">P2 新建记录 <span class="tag">高保真</span></p>
+      <p class="d">一个标题输入框与一个主按钮</p>
+    </a>
+    <a class="card" href="04-UI设计规范/高保真/hifi-P3-录音页.html">
+      <p class="t">P3 录音页 <span class="tag">核心</span></p>
+      <p class="d">96px 录音圆钮与片段管理</p>
+    </a>
+    <a class="card" href="04-UI设计规范/高保真/hifi-P4-转写与初稿.html">
+      <p class="t">P4 转写与初稿页 <span class="tag">高保真</span></p>
+      <p class="d">原文只读区与 AI 润色可编辑区分离</p>
+    </a>
+    <a class="card" href="04-UI设计规范/高保真/hifi-P5-在线编辑.html">
+      <p class="t">P5 在线编辑页 <span class="tag">高保真</span></p>
+      <p class="d">纯文本编辑与未保存离页拦截</p>
+    </a>
+    <a class="card" href="04-UI设计规范/高保真/hifi-P6-导出确认.html">
+      <p class="t">P6 导出确认 <span class="tag">高保真</span></p>
+      <p class="d">弹窗式导出摘要与校验</p>
+    </a>
+  </div>
+
+  <h2>低保真线框图</h2>
+  <div class="grid">
+    <a class="card" href="04-UI设计规范/线框图/wireframe-index.html">
+      <p class="t">线框索引页</p>
+      <p class="d">页面清单、覆盖对照与线框约定</p>
+    </a>
+    <a class="card" href="04-UI设计规范/线框图/wireframe-P3-录音页.html">
+      <p class="t">P3 录音页（核心）</p>
+      <p class="d">录音圆钮五态 + 异常态完整标注</p>
+    </a>
+  </div>
+
+  <h2>设计文档</h2>
+  <a class="card" href="01-PRD/myMemory口述记录生成传记系统_PRD（人工修改版）.html">
+    <p class="t">产品需求文档（PRD）</p>
+    <p class="d">实验 1 · 需求分析 —— 产品范围、用户场景、数据结构与页面交互</p>
+  </a>
+  <a class="card" href="05-业务边界清单/业务边界清单_人工修改版.md">
+    <p class="t">业务边界清单（做 / 不做）</p>
+    <p class="d">范围基线，明确本项目不做的功能</p>
+  </a>
+  <a class="card" href="02-技术方案/myMemory_技术方案与页面原型规划（人工修改稿）.html">
+    <p class="t">技术方案与页面原型规划（人工修改稿）</p>
+    <p class="d">实验 2 · 概要设计 —— 架构、技术栈、数据结构、接口、风险与验收标准</p>
+  </a>
+  <a class="card" href="02-技术方案/myMemory_技术方案与页面原型规划（AI原稿）.html">
+    <p class="t">技术方案（AI 原稿 · 对照）</p>
+    <p class="d">AI 生成的原始草稿，用于对照体现人工修订的颗粒度差异</p>
+  </a>
+  <a class="card" href="02-技术方案/myMemory_风险预案清单（人工修改稿）.html">
+    <p class="t">风险预案清单</p>
+    <p class="d">实验 2 交付物 —— 三类核心风险与专项降级方案</p>
+  </a>
+  <a class="card" href="03-模块与接口/myMemory_后端模块划分清单.html">
+    <p class="t">后端模块划分清单</p>
+    <p class="d">实验 3 · 详细设计 —— 6 个职责单一的后端模块与边界判据</p>
+  </a>
+  <a class="card" href="03-模块与接口/myMemory_API接口文档.html">
+    <p class="t">标准化 API 接口文档</p>
+    <p class="d">实验 3 · 详细设计 —— 4 个接口的完整契约与 21 个业务错误码</p>
+  </a>
+  <a class="card" href="04-UI设计规范/myMemory_UI设计规范_v2.0.html">
+    <p class="t">UI 设计规范 v2.0</p>
+    <p class="d">实验 3 · 详细设计 —— 配色 / 组件 / 排版栅格 / 交互四件套，附附录 A 高保真示意</p>
+  </a>
+
+  <div class="note">
+    全部界面稿均为<strong>单文件、零外部依赖</strong>，可直接下载后双击打开，也可在本站点击查看。
+    稿中数据均为虚构示例，不含任何真实音频或个人内容。
+  </div>
+
+  <footer>
+    myMemory 口述记录生成传记系统 · 课程实验文档成果 · 本站点已设置 noindex，不参与搜索引擎收录
+  </footer>
+</div>
+</body>
+</html>
