@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>myMemory 口述记录生成传记系统 技术设计方案（AI 原始草稿）</title>
+<style>
+@page { size: A4; margin: 2.2cm 2.4cm 2.2cm 2.4cm; }
+:root { --ink:#243447; --muted:#617083; --blue:#285f8f; --line:#d8e1ea; --soft:#f3f7fa; --accent:#eaf2f8; }
+* { box-sizing:border-box; }
+body { font-family:"Microsoft YaHei","SimSun",sans-serif; color:var(--ink); font-size:10.5pt; line-height:1.75; margin:0; }
+.cover { min-height:22cm; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; page-break-after:always; }
+.cover .eyebrow { color:var(--blue); font-size:12pt; letter-spacing:2px; margin-bottom:22px; }
+.cover h1 { font-size:26pt; line-height:1.35; margin:0 0 18px; color:#193b59; }
+.cover .subtitle { font-size:15pt; color:var(--muted); margin-bottom:70px; }
+.cover .meta { color:var(--muted); font-size:10.5pt; }
+.doc-header { border-bottom:1px solid var(--line); color:var(--muted); font-size:9pt; padding-bottom:7px; margin-bottom:24px; }
+.doc-footer { border-top:1px solid var(--line); color:var(--muted); font-size:9pt; padding-top:7px; margin-top:24px; text-align:center; }
+h1 { color:#193b59; font-size:20pt; margin:26px 0 13px; padding-bottom:6px; border-bottom:2px solid var(--blue); page-break-before:always; }
+h1:first-of-type { page-break-before:auto; }
+h2 { color:var(--blue); font-size:15pt; margin:22px 0 8px; }
+h3 { color:#3d617f; font-size:12pt; margin:16px 0 5px; }
+p { margin:7px 0; }
+blockquote { margin:14px 0; padding:10px 16px; background:var(--accent); border-left:4px solid var(--blue); color:#35516b; }
+ul, ol { margin:6px 0 10px 24px; padding-left:18px; }
+li { margin:3px 0; }
+strong { color:#183d5d; }
+table { width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:9.5pt; page-break-inside:avoid; }
+th { background:#eaf2f8; color:#244a69; font-weight:bold; }
+th, td { border:1px solid var(--line); padding:7px 8px; vertical-align:top; }
+tr:nth-child(even) td { background:#fbfcfd; }
+code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding:1px 4px; color:#814c22; }
+.note { background:#fff9e8; border-left:4px solid #d6a72c; padding:9px 13px; margin:12px 0; }
+.small { color:var(--muted); font-size:9pt; }
+</style>
+</head>
+<body>
+<section class="cover" role="cover">
+  <div class="eyebrow">技术设计方案（AI 原始草稿）</div>
+  <h1>myMemory<br>口述记录生成传记系统</h1>
+  <div class="subtitle">网页微缩版 · AI 生成草稿 v0.1</div>
+  <div class="meta">依据：《PRD（人工修改版）》　|　状态：AI 原始输出，待人工审阅修订　|　说明：本稿为 AI 直接生成，方向与定稿一致，但细节颗粒度较粗，供人工修订对照</div>
+</section>
+<section role="body" data-page-restart="1">
+<header class="doc-header">myMemory 口述记录生成传记系统（网页微缩版）｜技术设计方案（AI 原始草稿）</header>
+
+<h1>1. 项目概述与目标</h1>
+<h2>1.1 项目背景</h2>
+<p>myMemory 是一个面向中老年用户的口述记录生成传记系统。用户通过语音讲述人生经历，系统将语音转为文字，再通过 AI 整理为传记初稿，用户可在线编辑并导出文档。</p>
+<p>考虑到目标用户打字慢、不熟悉复杂软件，系统以"语音优先、操作简单、数据本地保存"为核心设计原则。</p>
+<h2>1.2 设计目标</h2>
+<ol>
+<li>实现口述录入、语音转写、AI 润色、在线编辑、文档导出的完整闭环。</li>
+<li>用户数据默认保存在本地浏览器，降低隐私风险。</li>
+<li>外部服务（语音识别、AI）统一由后端代理调用，前端不接触密钥。</li>
+<li>语音识别或 AI 不可用时，产品仍可作为本地录音与文本编辑工具使用。</li>
+</ol>
+<h2>1.3 成功标准</h2>
+<table><thead><tr><th>维度</th><th>标准</th></tr></thead><tbody>
+<tr><td>功能</td><td>主流程可完整走通：新建记录 → 录音 → 转写 → 润色 → 编辑 → 导出</td></tr>
+<tr><td>可降级</td><td>关闭后端后，本地录音、编辑与导出仍可用</td></tr>
+<tr><td>安全</td><td>前端与仓库中不存在任何密钥</td></tr>
+<tr><td>可用性</td><td>界面适配中老年用户，操作提示清晰</td></tr>
+</tbody></table>
+
+<h1>2. 技术栈选型</h1>
+<table><thead><tr><th>类别</th><th>选型</th><th>理由</th></tr></thead><tbody>
+<tr><td>前端框架</td><td>Vue 3 + TypeScript</td><td>组件化清晰，类型约束降低维护成本</td></tr>
+<tr><td>构建工具</td><td>Vite</td><td>启动与构建速度快</td></tr>
+<tr><td>状态管理</td><td>Pinia</td><td>Vue 3 官方推荐</td></tr>
+<tr><td>UI 组件库</td><td>Element Plus</td><td>组件丰富，表单类界面开发效率高</td></tr>
+<tr><td>样式方案</td><td>Tailwind CSS</td><td>统一间距与字号体系</td></tr>
+<tr><td>本地数据库</td><td>IndexedDB</td><td>可存储音频二进制与长文本，容量优于 localStorage</td></tr>
+<tr><td>录音</td><td>浏览器 MediaRecorder</td><td>无需额外依赖</td></tr>
+<tr><td>后端框架</td><td>ASP.NET Core Minimal API</td><td>与既有课程项目技术栈一致</td></tr>
+<tr><td>文档导出</td><td>后端生成 OOXML（DOCX）</td><td>不依赖 Office 组件，产物可靠</td></tr>
+<tr><td>语音识别</td><td>云端语音识别 API（后端代理）</td><td>中文识别准确率高</td></tr>
+<tr><td>AI 润色</td><td>大语言模型 API（后端代理）</td><td>文本整理能力强</td></tr>
+</tbody></table>
+
+<h1>3. 系统整体架构</h1>
+<h2>3.1 架构风格</h2>
+<p>系统采用前后端分离的轻量化单体架构，前端为 Vue 3 单页应用，后端为单个 ASP.NET Core Minimal API 服务，不引入微服务与容器编排。</p>
+<table><thead><tr><th>层</th><th>组成</th><th>职责</th></tr></thead><tbody>
+<tr><td>界面层</td><td>Vue 3 单页应用</td><td>页面结构、交互与状态展示</td></tr>
+<tr><td>状态与业务层</td><td>Pinia + 服务模块</td><td>记录与片段状态、流程编排</td></tr>
+<tr><td>本地数据层</td><td>IndexedDB</td><td>记录、片段、文本的持久化</td></tr>
+<tr><td>接口层</td><td>后端 HTTP 接口（本机回环地址）</td><td>转写、润色、导出，均为无状态处理</td></tr>
+<tr><td>外部服务层</td><td>语音识别服务、AI 服务</td><td>仅由后端调用，密钥保存在后端</td></tr>
+</tbody></table>
+<h2>3.2 数据流</h2>
+<blockquote>新建记录 → 录音（可多段）→ 语音转文字 → AI 润色生成初稿 → 在线编辑 → 导出 DOCX</blockquote>
+<p>记录与片段的增删改查全部在本地完成，只有转写、润色、导出三类操作经后端访问外部服务，后端不持久化用户数据。</p>
+<h2>3.3 部署与运行</h2>
+<p>前端构建为静态资源，后端以本机服务形式运行并监听回环地址，两者通过本机端口交互，不部署到公网服务器。</p>
+
+<h1>4. 项目模块划分</h1>
+<table><thead><tr><th>编号</th><th>模块</th><th>说明</th><th>优先级</th></tr></thead><tbody>
+<tr><td>M01</td><td>记录管理</td><td>新建、查看、改名、删除传记记录</td><td>P0</td></tr>
+<tr><td>M02</td><td>录音录入</td><td>麦克风授权、开始暂停继续结束、时长、播放</td><td>P0</td></tr>
+<tr><td>M03</td><td>本地存储</td><td>记录与音频持久化在浏览器，刷新不丢</td><td>P0</td></tr>
+<tr><td>M04</td><td>多段口述管理</td><td>同主题追加片段、排序、单段删除</td><td>P1</td></tr>
+<tr><td>M05</td><td>文本编辑与保存</td><td>标题与正文编辑、显式保存</td><td>P0</td></tr>
+<tr><td>M06</td><td>文档导出</td><td>导出 DOCX</td><td>P0</td></tr>
+<tr><td>M07</td><td>语音转文字</td><td>音频转中文文本、进度、失败重试</td><td>P0</td></tr>
+<tr><td>M08</td><td>AI 润色与合并</td><td>生成传记初稿、多段合并</td><td>P0</td></tr>
+<tr><td>M09</td><td>状态与异常反馈</td><td>流程状态与错误提示</td><td>P0</td></tr>
+<tr><td>M10</td><td>隐私与数据管理</td><td>保存范围说明、一键清除</td><td>P1</td></tr>
+<tr><td>M11</td><td>音频文件上传</td><td>作为语音录入的备用方式</td><td>P1</td></tr>
+</tbody></table>
+
+<h1>5. 开发命名与目录规范</h1>
+<h2>5.1 目录结构</h2>
+<table><thead><tr><th>目录</th><th>说明</th></tr></thead><tbody>
+<tr><td>web/</td><td>前端工程（Vue 3）</td></tr>
+<tr><td>web/src/views/</td><td>页面级组件</td></tr>
+<tr><td>web/src/components/</td><td>通用组件</td></tr>
+<tr><td>web/src/stores/</td><td>Pinia 状态管理</td></tr>
+<tr><td>web/src/services/</td><td>接口与外部能力封装</td></tr>
+<tr><td>web/src/db/</td><td>本地数据层，封装 IndexedDB</td></tr>
+<tr><td>server/</td><td>后端 Minimal API 工程</td></tr>
+<tr><td>docs/</td><td>项目文档</td></tr>
+</tbody></table>
+<h2>5.2 命名规范</h2>
+<ul>
+<li>变量与函数使用小驼峰，如 <code>segmentCount</code>、<code>startRecording()</code>。</li>
+<li>组件与类型使用大驼峰，如 <code>RecordList.vue</code>、<code>interface Segment</code>。</li>
+<li>常量使用全大写下划线，如 <code>MAX_AUDIO_MINUTES</code>。</li>
+<li>数据字段使用小写下划线，如 <code>story_id</code>、<code>transcribed_text</code>。</li>
+<li>接口路径使用小写复数名词，如 <code>/api/transcriptions</code>。</li>
+</ul>
+<h2>5.3 提交规范</h2>
+<ul>
+<li>提交信息使用 <code>类型: 简述</code> 格式，类型取 <code>feat / fix / docs / refactor / chore</code>。</li>
+<li><code>.gitignore</code> 必须忽略本地配置、<code>node_modules/</code>、<code>dist/</code>、<code>bin/</code>、日志与临时文件。</li>
+</ul>
+
+<h1>6. 数据表结构设计</h1>
+<h2>6.1 记录表（Story）</h2>
+<table><thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead><tbody>
+<tr><td>story_id</td><td>字符串</td><td>唯一标识</td></tr>
+<tr><td>title</td><td>字符串</td><td>记录标题</td></tr>
+<tr><td>polished_text</td><td>长文本</td><td>AI 润色后的传记正文</td></tr>
+<tr><td>status</td><td>枚举</td><td>未录入 / 转写中 / 待编辑 / 已完成</td></tr>
+<tr><td>segment_count</td><td>整数</td><td>片段数量</td></tr>
+<tr><td>created_at</td><td>日期时间</td><td>创建时间</td></tr>
+<tr><td>updated_at</td><td>日期时间</td><td>最近修改时间</td></tr>
+</tbody></table>
+<h2>6.2 片段表（Segment）</h2>
+<table><thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead><tbody>
+<tr><td>segment_id</td><td>字符串</td><td>片段唯一标识</td></tr>
+<tr><td>story_id</td><td>字符串</td><td>所属记录标识</td></tr>
+<tr><td>order_index</td><td>整数</td><td>录入顺序</td></tr>
+<tr><td>audio_blob</td><td>二进制</td><td>音频数据</td></tr>
+<tr><td>audio_duration</td><td>整数</td><td>音频时长（秒）</td></tr>
+<tr><td>transcribed_text</td><td>长文本</td><td>原始转写文本</td></tr>
+<tr><td>transcription_status</td><td>枚举</td><td>未开始 / 处理中 / 成功 / 失败</td></tr>
+<tr><td>created_at</td><td>日期时间</td><td>片段创建时间</td></tr>
+</tbody></table>
+<h2>6.3 数据处理原则</h2>
+<ol>
+<li>原始转写文本与润色文本分字段保存，不相互覆盖。</li>
+<li>删除记录时级联删除其全部片段与音频。</li>
+<li>第一版不做历史版本。</li>
+</ol>
+
+<h1>7. 接口设计</h1>
+<table><thead><tr><th>方法</th><th>路径</th><th>说明</th></tr></thead><tbody>
+<tr><td>GET</td><td>/api/health</td><td>服务健康检查，用于前端判断智能能力是否可用</td></tr>
+<tr><td>POST</td><td>/api/transcriptions</td><td>提交音频，返回原始转写文本</td></tr>
+<tr><td>POST</td><td>/api/polish</td><td>提交原始转写文本，返回润色正文</td></tr>
+<tr><td>POST</td><td>/api/exports</td><td>提交标题与正文，返回 DOCX 文件</td></tr>
+</tbody></table>
+<div class="note">说明：接口需设置超时与重试上限，失败时返回明确错误信息供前端提示。</div>
+
+<h1>8. 页面结构规划</h1>
+<h2>8.1 页面清单</h2>
+<table><thead><tr><th>编号</th><th>页面</th><th>主要操作</th><th>优先级</th></tr></thead><tbody>
+<tr><td>P1</td><td>首页 / 记录列表</td><td>新建口述记录</td><td>P0</td></tr>
+<tr><td>P2</td><td>新建记录</td><td>开始录音</td><td>P0</td></tr>
+<tr><td>P3</td><td>录音页</td><td>开始录音 / 确认录音</td><td>P0</td></tr>
+<tr><td>P4</td><td>转写与初稿页</td><td>开始转写 / 生成初稿</td><td>P0</td></tr>
+<tr><td>P5</td><td>在线编辑页</td><td>保存内容</td><td>P0</td></tr>
+<tr><td>P6</td><td>导出确认</td><td>导出文档</td><td>P0</td></tr>
+</tbody></table>
+<h2>8.2 各页面说明</h2>
+<ul>
+<li><strong>P1 首页 / 记录列表：</strong>展示记录列表与状态，提供唯一主要按钮"新建口述记录"，每条记录可继续编辑或删除。</li>
+<li><strong>P2 新建记录：</strong>填写标题后进入录音页。</li>
+<li><strong>P3 录音页：</strong>显示当前标题与片段数量，提供录音、暂停、继续、结束、播放、确认等操作，另提供"上传音频"备用入口。</li>
+<li><strong>P4 转写与初稿页：</strong>分区展示原始转写文本与 AI 润色文本，并提供事实核对提示。</li>
+<li><strong>P5 在线编辑页：</strong>标题输入框加普通文本编辑区，提供"保存内容"按钮。</li>
+<li><strong>P6 导出确认：</strong>展示待导出的标题与正文，确认后导出 DOCX。</li>
+</ul>
+<h2>8.3 交互约定</h2>
+<ul>
+<li>每页设置一个主要按钮，次级操作视觉权重更低。</li>
+<li>按钮点击区域不小于 48px，正文字号不小于 16px。</li>
+<li>状态变化需给出文字提示。</li>
+<li>危险操作（删除记录、重新录制）需二次确认。</li>
+</ul>
+
+<h1>9. 非功能需求</h1>
+<h2>9.1 性能</h2>
+<table><thead><tr><th>指标</th><th>目标值</th></tr></thead><tbody>
+<tr><td>首屏可交互时间</td><td>本地环境 ≤ 2 秒</td></tr>
+<tr><td>录音按钮响应</td><td>≤ 100 毫秒</td></tr>
+<tr><td>单段音频上限</td><td>30 分钟</td></tr>
+<tr><td>导出生成</td><td>≤ 5 秒</td></tr>
+</tbody></table>
+<h2>9.2 安全</h2>
+<ul>
+<li>外部服务密钥只存在于后端环境变量，前端产物与仓库中不得出现。</li>
+<li>后端仅监听回环地址，不对公网开放。</li>
+<li>上传接口限制文件类型与大小。</li>
+<li>删除记录时同步清理音频与文本，不留孤儿数据。</li>
+</ul>
+<h2>9.3 隐私与数据合规</h2>
+<ul>
+<li>页面明确说明记录默认保存在当前设备和浏览器。</li>
+<li>调用外部服务前以文字提示用户并取得确认。</li>
+<li>后端处理请求时不将音频落盘。</li>
+<li>提供"清除全部本地数据"入口。</li>
+</ul>
+<h2>9.4 兼容性</h2>
+<ul>
+<li>支持 Chrome / Edge 最新版本；Safari 与 Firefox 基础支持。</li>
+<li>界面按最小宽度 768px 设计。</li>
+</ul>
+<h2>9.5 可用性</h2>
+<ul>
+<li>所有状态必须有文字说明，不能只用颜色表达。</li>
+<li>错误提示给出下一步动作。</li>
+</ul>
+
+<h1>10. 关键流程说明</h1>
+<h2>10.1 端到端主流程</h2>
+<blockquote>新建记录 → 录音（可多段）→ 语音转文字 → AI 润色生成初稿 → 在线编辑 → 导出 DOCX</blockquote>
+<p>任何一步失败都必须保留前序成果，允许用户重试当前步骤而不是回到起点。</p>
+<h2>10.2 录音流程</h2>
+<ol>
+<li>点击"开始录音"，浏览器请求麦克风权限。</li>
+<li>录音中显示状态与已录时长，可暂停与继续。</li>
+<li>结束后生成本地音频对象，可试听并按需重新录制。</li>
+<li>确认后写入本地存储。</li>
+</ol>
+<h2>10.3 转写与润色流程</h2>
+<ol>
+<li>前端将音频发送至后端转写接口，得到原始转写文本。</li>
+<li>提交原始转写文本生成传记初稿。</li>
+<li>页面分区展示原文与润色结果。</li>
+</ol>
+<div class="note"><strong>技术约束：</strong>原始转写文本与润色文本必须分字段存储，润色结果不得覆盖原文；AI 返回内容不得新增原始文本中不存在的人物、时间、地点与事件。</div>
+<h2>10.4 编辑与导出流程</h2>
+<ol>
+<li>进入编辑页修改标题与正文，点击"保存内容"写入本地存储。</li>
+<li>导出前校验标题、正文是否为空以及是否存在未保存修改。</li>
+<li>通过后由后端组装 DOCX，浏览器触发下载。</li>
+</ol>
+<h2>10.5 异常与恢复原则</h2>
+<table><thead><tr><th>异常</th><th>处理原则</th></tr></thead><tbody>
+<tr><td>麦克风未授权</td><td>文字提示重新授权方法，保留当前状态</td></tr>
+<tr><td>转写失败</td><td>保留音频与已有文本，提供重新转写入口</td></tr>
+<tr><td>AI 生成失败</td><td>原始转写文本不丢失，可稍后重试</td></tr>
+<tr><td>网络中断</td><td>本地功能继续可用，提示联网后重试</td></tr>
+<tr><td>本地存储不足</td><td>提示清理或导出后删除旧记录</td></tr>
+</tbody></table>
+
+<h1>11. 项目里程碑</h1>
+<table><thead><tr><th>里程碑</th><th>目标</th><th>主要交付物</th></tr></thead><tbody>
+<tr><td>M0 方案冻结</td><td>确认技术方案与原型</td><td>本文档、页面清单、数据结构</td></tr>
+<tr><td>M1 本地记录工具</td><td>可录音、可保存、刷新不丢</td><td>P1–P3 页面、本地存储、录音能力</td></tr>
+<tr><td>M2 离线闭环</td><td>无智能能力也能走完全流程</td><td>P5、P6 页面、编辑保存、DOCX 导出</td></tr>
+<tr><td>M3 智能能力</td><td>接入转写与润色</td><td>P4 页面、转写接口、润色接口</td></tr>
+<tr><td>M4 硬化与交付</td><td>异常、隐私、测试、文档完善</td><td>异常处理、隐私提示、测试记录</td></tr>
+</tbody></table>
+<p>交付顺序原则：先保证 M1 与 M2 完全可用，再接入外部服务，确保即使智能能力不可用项目仍具备演示价值。</p>
+
+<h1>12. 风险预案</h1>
+<table><thead><tr><th>风险</th><th>影响</th><th>应对措施</th></tr></thead><tbody>
+<tr><td>用户口述隐私信息泄露</td><td>隐私事故，用户信任受损</td><td>数据默认仅存本地、上传前告知并确认、后端不落盘、提供一键清除入口</td></tr>
+<tr><td>语音文件存储异常</td><td>录音丢失或无法转写</td><td>录音结束校验非空再落库、配额不足提前提示、转写成功前不删除原音频</td></tr>
+<tr><td>AI 润色超越事实边界</td><td>传记内容失真</td><td>提示词禁止虚构、原文与润色分栏对照、导出前提示用户核对</td></tr>
+<tr><td>浏览器存储被清理</td><td>记录与音频丢失</td><td>显式保存反馈、导出提示、清除前二次确认</td></tr>
+<tr><td>麦克风权限被拒</td><td>无法录音</td><td>文字指引重新授权、提供音频上传备用路径</td></tr>
+<tr><td>密钥误入仓库</td><td>安全事件与费用损失</td><td>密钥仅存后端环境变量、提交前扫描、只提交示例模板</td></tr>
+<tr><td>需求在开发中扩张</td><td>进度失控</td><td>以业务边界清单为准</td></tr>
+</tbody></table>
+
+<h1>13. 验收标准</h1>
+<ol>
+<li>可新建、查看、删除记录，删除前有二次确认。</li>
+<li>可完成一次或多次录音，可暂停、结束、播放与重录。</li>
+<li>刷新页面后记录与音频仍然存在。</li>
+<li>可对音频执行转写，原文不被润色结果覆盖。</li>
+<li>可生成 AI 传记初稿，并支持多段合并。</li>
+<li>可编辑标题与正文并保存。</li>
+<li>可导出可正常打开的 DOCX 文档。</li>
+<li>任一环节失败时已有内容不丢失，并提供重试入口。</li>
+</ol>
+
+<h1>14. 后续迭代方向</h1>
+<ol>
+<li>导出格式扩展，增加 TXT 备用格式。</li>
+<li>朗读能力，方便老人核对内容。</li>
+<li>账号与跨设备同步，需重新评估隐私说明。</li>
+<li>历史版本记录，用于找回旧稿。</li>
+</ol>
+<footer class="doc-footer">myMemory 技术设计方案（AI 原始草稿）v0.1｜依据《PRD（人工修改版）》生成</footer>
+</section>
+</body>
+</html>
