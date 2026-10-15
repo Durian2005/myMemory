@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>线框 P1 首页/记录列表 · myMemory</title>
+<style>
+:root{
+  --p:#B4785A; --p-h:#9E6650; --p-soft:#E8D5C6;
+  --ok:#8A9A5B; --warn:#C99A4E; --danger:#B5675A;
+  --ink:#3D332C; --muted:#7A6A5E; --line:#E3D8CC;
+  --bg:#FDFAF5; --bg-sub:#F7F1E8; --bg-h:#EFE4D6;
+  --link:#9E6650; --ph:#EFE4D6;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:28px 24px 64px;background:var(--bg-sub);color:var(--ink);
+  font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:16px;line-height:1.6;}
+.wrap{max-width:1100px;margin:0 auto;}
+a{color:var(--link);}
+.crumb{font-size:15px;margin-bottom:14px;}
+
+/* 顶部规范条 */
+.specbar{background:var(--bg);border:1px solid var(--line);border-left:6px solid var(--p);
+  border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+.specbar h1{margin:0 0 6px;font-size:22px;color:var(--ink);}
+.specbar .sub{color:var(--muted);font-size:15px;}
+.specbar .tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--bg-h);color:#6b5a4d;border:1px solid var(--line);}
+
+/* 设备框 */
+.frame{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(61,51,44,.06);}
+.topbar{height:64px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid var(--line);background:var(--bg);}
+.topbar .back{font-size:15px;color:var(--link);}
+.topbar .title{font-size:18px;font-weight:600;}
+.topbar .right{margin-left:auto;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--bg-sub);}
+.content{position:relative;min-height:420px;padding:32px 24px;}
+.page-title{font-size:26px;font-weight:700;margin:0 0 6px;}
+.page-sub{color:var(--muted);font-size:15px;margin:0 0 24px;}
+.actionbar{height:80px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
+  padding:0 24px;border-top:1px solid var(--line);background:var(--bg);}
+
+/* 按钮（线框示意，仅表达层级与尺寸） */
+.btn{border-radius:12px;padding:0 24px;font-size:16px;font-weight:600;display:inline-flex;
+  align-items:center;justify-content:center;white-space:nowrap;}
+.btn-primary{height:56px;background:var(--p);color:var(--bg);border:none;}
+.btn-secondary{height:48px;background:var(--bg);color:var(--p-h);border:1px solid var(--line);font-weight:500;}
+.btn-text{height:48px;background:none;border:none;color:var(--muted);font-weight:500;padding:0 10px;}
+.btn-text.danger{color:var(--danger);}
+.btn[disabled]{opacity:.4;}
+
+/* 占位块 */
+.ph{background:var(--ph);border:1px dashed var(--line);border-radius:10px;display:flex;
+  align-items:center;justify-content:center;color:#8a7565;font-size:14px;text-align:center;padding:8px;}
+
+/* 编号标记 */
+.mk{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;
+  background:var(--p);color:var(--bg);font-size:13px;font-weight:700;line-height:1;flex:0 0 auto;}
+.mk.abs{position:absolute;top:-11px;left:-11px;}
+
+/* 列表卡片 */
+.card{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 1px 2px rgba(61,51,44,.06);padding:24px;margin-bottom:16px;}
+.card .rtitle{font-size:24px;font-weight:700;margin:0 0 8px;}
+.card .rmeta{color:var(--muted);font-size:15px;margin:0 0 16px;}
+.card .rmeta .st{display:inline-block;border:1px solid var(--line);border-radius:999px;
+  padding:1px 10px;font-size:14px;background:var(--bg-sub);margin-left:6px;}
+.card .racts{display:flex;align-items:center;gap:12px;}
+.card .racts .grow{margin-left:auto;}
+
+/* 标注 */
+.annos{margin-top:20px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px 20px;}
+.annos h2{font-size:18px;margin:0 0 10px;}
+.annos ul{margin:0;padding:0;list-style:none;}
+.annos li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:15px;border-bottom:1px dashed var(--line);}
+.annos li:last-child{border-bottom:none;}
+
+/* 变体区 */
+.variants{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}
+.var{background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:16px;}
+.var h3{margin:0 0 12px;font-size:16px;color:var(--muted);font-weight:600;}
+.empty{text-align:center;padding:32px 16px;}
+.empty .et{font-size:18px;color:var(--muted);margin-bottom:16px;}
+.skel{height:20px;border-radius:6px;background:var(--ph);margin-bottom:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="wireframe-index.html">← 返回线框索引</a></div>
+
+  <div class="specbar">
+    <h1>P1 首页 / 记录列表（低保真线框）</h1>
+    <div class="sub">依据《技术方案与页面原型规划（人工修改稿）》9.1 信息架构、9.2 页面描述；Token 依据《UI 设计规范 v1.0》第 2 章。</div>
+    <div class="tags">
+      <span class="tag">优先级 P0</span>
+      <span class="tag">主要操作：新建口述记录</span>
+      <span class="tag">状态：正常 / 空 / 加载 / 读取失败</span>
+      <span class="tag">暖调线框 · 颜色仅为占位</span>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="topbar">
+      <span class="title">myMemory</span>
+      <span class="right">服务：正常</span>
+    </div>
+
+    <div class="content">
+      <h2 class="page-title">我的口述记录</h2>
+      <p class="page-sub">共 3 条记录　·　所有内容仅保存在本机浏览器中</p>
+
+      <div class="card">
+        <span class="mk abs">1</span>
+        <h3 class="rtitle">我在南昌的童年</h3>
+        <p class="rmeta">更新于 2026-10-08 21:30　·　3 段录音<span class="st">已保存</span></p>
+        <div class="racts">
+          <button class="btn btn-secondary">继续编辑</button>
+          <button class="btn btn-text">查看</button>
+          <button class="btn btn-text danger">删除</button>
+          <button class="btn btn-secondary grow" disabled>导出文档</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="mk abs">2</span>
+        <h3 class="rtitle">在南京读书的日子</h3>
+        <p class="rmeta">更新于 2026-10-07 19:12　·　2 段录音<span class="st">待转写</span></p>
+        <div class="racts">
+          <button class="btn btn-secondary">继续编辑</button>
+          <button class="btn btn-text">查看</button>
+          <button class="btn btn-text danger">删除</button>
+          <button class="btn btn-secondary grow">导出文档</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="mk abs">3</span>
+        <h3 class="rtitle">家里的老物件</h3>
+        <p class="rmeta">更新于 2026-10-05 09:40　·　1 段录音<span class="st">仅录音</span></p>
+        <div class="racts">
+          <button class="btn btn-secondary">继续编辑</button>
+          <button class="btn btn-text">查看</button>
+          <button class="btn btn-text danger">删除</button>
+          <button class="btn btn-secondary grow" disabled>导出文档</button>
+        </div>
+      </div>
+
+      <div class="ph" style="height:56px;margin-top:8px">记录列表继续向下滚动区域（超出可视范围时的滚动容器）</div>
+    </div>
+
+    <div class="actionbar">
+      <span class="mk abs" style="top:auto;bottom:-11px;left:auto;right:24px">4</span>
+      <button class="btn btn-primary">新建口述记录</button>
+    </div>
+  </div>
+
+  <div class="annos">
+    <h2>标注说明</h2>
+    <ul>
+      <li><span class="mk">1</span><span>记录卡片：奶油白底、12px 圆角、单档投影、内边距 24px；自上而下顺序固定为「标题 → 更新时间与录音段数 → 状态标签 → 次级操作行」。标题 24px/700，使用 <code>--text-title</code>。</span></li>
+      <li><span class="mk">2</span><span>状态标签：暖色浅底描边胶囊，取值「已保存 / 待转写 / 仅录音」，与 9.2 的「当前状态」对应，不用颜色单独表意。</span></li>
+      <li><span class="mk">3</span><span>次级入口：<strong>继续编辑</strong>为次按钮（48px），<strong>查看</strong>、<strong>删除</strong>为文字按钮（48px，删除用暖调危险色 <code>#B5675A</code>）。删除必须触发二次确认弹窗。右侧「导出文档」为快捷入口，正文或标题为空时禁用并说明原因。</span></li>
+      <li><span class="mk">4</span><span>底部动作区 80px：全页<strong>唯一主按钮</strong>「新建口述记录」（56px 暖木色实心），固定在动作区以保证始终可见。</span></li>
+    </ul>
+  </div>
+
+  <div class="variants">
+    <div class="var">
+      <h3>变体一 · 空态（无任何记录）</h3>
+      <div class="empty">
+        <div class="et">还没有口述记录，可以先创建一条记录</div>
+        <button class="btn btn-primary">新建口述记录</button>
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin:12px 0 0">与组件规范 3.6 一致：一句话说明 + 一个主操作，不使用插画。</p>
+    </div>
+
+    <div class="var">
+      <h3>变体二 · 加载态</h3>
+      <div style="padding:8px 0">
+        <div class="skel" style="width:60%;height:24px"></div>
+        <div class="skel" style="width:40%"></div>
+        <div class="skel" style="width:60%;height:24px;margin-top:24px"></div>
+        <div class="skel" style="width:40%"></div>
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin:12px 0 0">使用骨架块而非转圈；同时给出文字「正在加载…」。</p>
+    </div>
+
+    <div class="var">
+      <h3>变体三 · 本地存储读取失败</h3>
+      <div style="border-left:4px solid var(--danger);background:var(--bg-h);padding:12px 16px;border-radius:8px">
+        <div style="font-weight:600;margin-bottom:4px">读取本地数据失败</div>
+        <div style="color:var(--muted)">请刷新页面重试；若仍失败，请检查浏览器是否处于隐私模式。</div>
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin:12px 0 0">错误句式固定为「原因 + 下一步动作」。</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>myMemory 低保真线框索引 · P1–P6</title>
+<style>
+:root{
+  --p:#B4785A; --p-h:#9E6650; --p-soft:#E8D5C6;
+  --ok:#8A9A5B; --warn:#C99A4E; --danger:#B5675A;
+  --ink:#3D332C; --muted:#7A6A5E; --line:#E3D8CC;
+  --bg:#FDFAF5; --bg-sub:#F7F1E8; --bg-h:#EFE4D6;
+  --link:#9E6650; --ph:#EFE4D6;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:40px 24px 72px;background:var(--bg-sub);color:var(--ink);
+  font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:16px;line-height:1.7;}
+.wrap{max-width:1000px;margin:0 auto;}
+.hero{background:var(--bg);border:1px solid var(--line);border-left:6px solid var(--p);
+  border-radius:16px;padding:28px 28px 24px;margin-bottom:24px;}
+.hero .eyebrow{color:var(--p-h);font-size:15px;letter-spacing:1px;margin-bottom:8px;}
+.hero h1{margin:0 0 10px;font-size:30px;line-height:1.3;}
+.hero .sub{color:var(--muted);font-size:16px;margin:0;}
+.hero .tags{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--bg-h);color:#6b5a4d;border:1px solid var(--line);}
+h2{font-size:20px;margin:32px 0 14px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}
+.card{display:block;text-decoration:none;color:inherit;background:var(--bg);border:1px solid var(--line);
+  border-radius:12px;padding:20px;box-shadow:0 1px 2px rgba(61,51,44,.06);transition:background .15s;}
+.card:hover{background:var(--bg-h);}
+.card .pid{display:inline-flex;align-items:center;justify-content:center;height:26px;min-width:38px;
+  padding:0 10px;border-radius:999px;background:var(--p);color:var(--bg);font-size:14px;font-weight:700;margin-bottom:12px;}
+.card h3{margin:0 0 6px;font-size:20px;}
+.card p{margin:0 0 12px;color:var(--muted);font-size:15px;}
+.card .meta{font-size:14px;color:#8a7565;}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--bg);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+th{background:var(--bg-h);color:#6b5a4d;text-align:left;font-weight:600;}
+th,td{border-top:1px solid var(--line);padding:10px 16px;vertical-align:top;}
+.box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:20px 24px;}
+.box ul{margin:0;padding-left:22px;}
+.box li{margin:6px 0;}
+.note{background:var(--bg-h);border-left:4px solid var(--warn);border-radius:8px;padding:14px 18px;margin-top:20px;font-size:15px;}
+footer{margin-top:40px;color:var(--muted);font-size:14px;text-align:center;}
+a{color:var(--link);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">低保真线框图 · 第二步产出</div>
+    <h1>myMemory 口述记录生成传记系统<br>线框索引（P1–P6）</h1>
+    <p class="sub">依据《技术方案与页面原型规划（人工修改稿）》第 9 章「页面结构与原型规划」绘制；视觉 Token 依据《UI 设计规范 v1.0》第 2 章。</p>
+    <div class="tags">
+      <span class="tag">6 个页面</span>
+      <span class="tag">暖调线框（颜色仅为占位）</span>
+      <span class="tag">覆盖常态 / 空态 / 异常态</span>
+      <span class="tag">纯静态 HTML，无外部依赖</span>
+    </div>
+  </div>
+
+  <h2>页面清单</h2>
+  <div class="grid">
+    <a class="card" href="wireframe-P1-记录列表.html">
+      <span class="pid">P1</span>
+      <h3>首页 / 记录列表</h3>
+      <p>记录卡片列表 + 唯一主按钮「新建口述记录」。</p>
+      <div class="meta">状态：正常 / 空 / 加载 / 读取失败　·　对应 9.2</div>
+    </a>
+    <a class="card" href="wireframe-P2-新建记录.html">
+      <span class="pid">P2</span>
+      <h3>新建记录</h3>
+      <p>一个标题输入框 + 一个主按钮，结构最简。</p>
+      <div class="meta">状态：正常 / 标题为空 / 创建失败　·　对应 9.3</div>
+    </a>
+    <a class="card" href="wireframe-P3-录音页.html">
+      <span class="pid">P3</span>
+      <h3>录音页（核心）</h3>
+      <p>96px 录音圆钮 + 片段列表，五种圆钮状态完整呈现。</p>
+      <div class="meta">状态：未开始 / 录音中 / 已暂停 / 待确认 / 失败　·　对应 9.4</div>
+    </a>
+    <a class="card" href="wireframe-P4-转写与初稿.html">
+      <span class="pid">P4</span>
+      <h3>转写与初稿页</h3>
+      <p>常驻失真提示 + 原始转写（只读）与 AI 润色（可编辑）分区。</p>
+      <div class="meta">状态：未转写 / 转写中 / 完成 / 失败 / 本地模式　·　对应 9.5</div>
+    </a>
+    <a class="card" href="wireframe-P5-在线编辑.html">
+      <span class="pid">P5</span>
+      <h3>在线编辑页</h3>
+      <p>纯文本编辑区（无富文本工具栏）+ 未保存离页确认弹窗。</p>
+      <div class="meta">状态：编辑中 / 未保存 / 已保存 / 保存失败　·　对应 9.6</div>
+    </a>
+    <a class="card" href="wireframe-P6-导出确认.html">
+      <span class="pid">P6</span>
+      <h3>导出确认</h3>
+      <p>弹窗展示导出摘要，主按钮位于弹窗底部右侧。</p>
+      <div class="meta">状态：校验失败 ×3 / 生成中 / 完成 / 失败　·　对应 9.7</div>
+    </a>
+  </div>
+
+  <h2>覆盖对照</h2>
+  <table>
+    <thead><tr><th>技术方案章节</th><th>要求要点</th><th>线框落点</th></tr></thead>
+    <tbody>
+      <tr><td>9.1 信息架构</td><td>P1–P6 六个页面与各自主要操作</td><td>本索引页 + 六个线框</td></tr>
+      <tr><td>9.2–9.7 页面描述</td><td>各页元素、主要按钮、提示文案</td><td>逐页 1:1 对应，含标注说明</td></tr>
+      <tr><td>9.8 统一交互与视觉规范</td><td>每页一个主按钮、点击区 ≥48px、字号 ≥16px、状态文字化、错误句式、危险操作二次确认</td><td>各页底部动作区 + 标注 + 变体区逐条体现</td></tr>
+      <tr><td>7.8 异常与恢复原则</td><td>8 条异常的处理方式</td><td>P1/P3/P4/P5/P6 的「状态与异常」表</td></tr>
+      <tr><td>UI 规范 3.2 录音按钮</td><td>五种状态的圆钮外观与文案</td><td>P3「录音圆钮的五种状态」表</td></tr>
+      <tr><td>UI 规范 5.2 页面级状态矩阵</td><td>每页主要状态 / 错误态 / 文案要点</td><td>各页状态表与变体区</td></tr>
+    </tbody>
+  </table>
+
+  <h2>线框约定</h2>
+  <div class="box">
+    <ul>
+      <li><strong>低保真定位：</strong>只表达位置、层级、尺寸与状态，不追求视觉。灰色块与虚线框均为占位，不代表最终样式。</li>
+      <li><strong>暖调而非冷灰：</strong>配色沿用《UI 设计规范 v1.0》的暖色 Token（奶油白 <code>#FDFAF5</code>、米白 <code>#F7F1E8</code>、浅驼 <code>#E3D8CC</code>、暖木 <code>#B4785A</code>、暖褐黑 <code>#3D332C</code>），避免线框与高保真阶段出现冷暖断层。</li>
+      <li><strong>编号标注：</strong>页面内带数字的圆点与下方「标注说明」一一对应，用于在评审时逐条核对。</li>
+      <li><strong>状态覆盖：</strong>每页在主视图之外单列变体，确保空态、加载态、异常态不会在实现阶段漏做。</li>
+      <li><strong>无外部依赖：</strong>全部为单文件静态 HTML，内联样式，离线可直接双击打开；不含任何真实音频或个人内容。</li>
+    </ul>
+  </div>
+
+  <div class="note">
+    <strong>评审建议：</strong>本轮需确认的是<strong>信息层级与流程顺序</strong>，不是好不好看。请重点看三处 —— P3 录音页的「圆钮 + 次级操作 + 底部确认」三分结构是否顺手；P4 的「原文 / 润色」两区分离是否清晰；P5 的纯文本编辑是否符合「不提供富文本」的约束。这三处定了，第三步的高保真就是照着画。
+  </div>
+
+  <footer>
+    myMemory 线框图 · 依据《技术方案与页面原型规划（人工修改稿）》9.1–9.8 与《UI 设计规范 v1.0》绘制
+  </footer>
+</div>
+</body>
+</html>

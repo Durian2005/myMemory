@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>线框 P2 新建记录 · myMemory</title>
+<style>
+:root{
+  --p:#B4785A; --p-h:#9E6650; --p-soft:#E8D5C6;
+  --ok:#8A9A5B; --warn:#C99A4E; --danger:#B5675A;
+  --ink:#3D332C; --muted:#7A6A5E; --line:#E3D8CC;
+  --bg:#FDFAF5; --bg-sub:#F7F1E8; --bg-h:#EFE4D6;
+  --link:#9E6650; --ph:#EFE4D6;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:28px 24px 64px;background:var(--bg-sub);color:var(--ink);
+  font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:16px;line-height:1.6;}
+.wrap{max-width:1100px;margin:0 auto;}
+a{color:var(--link);}
+.crumb{font-size:15px;margin-bottom:14px;}
+.specbar{background:var(--bg);border:1px solid var(--line);border-left:6px solid var(--p);
+  border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+.specbar h1{margin:0 0 6px;font-size:22px;}
+.specbar .sub{color:var(--muted);font-size:15px;}
+.specbar .tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--bg-h);color:#6b5a4d;border:1px solid var(--line);}
+.frame{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(61,51,44,.06);}
+.topbar{height:64px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid var(--line);}
+.topbar .back{font-size:15px;color:var(--link);}
+.topbar .title{font-size:18px;font-weight:600;}
+.topbar .right{margin-left:auto;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--bg-sub);}
+.content{position:relative;min-height:400px;padding:32px 24px;}
+.page-title{font-size:26px;font-weight:700;margin:0 0 6px;}
+.page-sub{color:var(--muted);font-size:15px;margin:0 0 28px;}
+.actionbar{height:80px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
+  padding:0 24px;border-top:1px solid var(--line);}
+.btn{border-radius:12px;padding:0 24px;font-size:16px;font-weight:600;display:inline-flex;
+  align-items:center;justify-content:center;white-space:nowrap;}
+.btn-primary{height:56px;background:var(--p);color:var(--bg);border:none;}
+.btn-secondary{height:48px;background:var(--bg);color:var(--p-h);border:1px solid var(--line);font-weight:500;}
+.btn-text{height:48px;background:none;border:none;color:var(--muted);font-weight:500;padding:0 10px;}
+.ph{background:var(--ph);border:1px dashed var(--line);border-radius:10px;display:flex;
+  align-items:center;justify-content:center;color:#8a7565;font-size:14px;text-align:center;padding:8px;}
+.mk{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;
+  background:var(--p);color:var(--bg);font-size:13px;font-weight:700;line-height:1;flex:0 0 auto;}
+.mk.abs{position:absolute;top:-11px;left:-11px;}
+.field{position:relative;max-width:640px;}
+.field label{display:block;font-size:16px;font-weight:500;margin-bottom:8px;}
+.input{height:56px;border:1px solid var(--line);border-radius:8px;background:var(--bg);
+  display:flex;align-items:center;padding:0 16px;color:#a89583;}
+.hint{color:var(--muted);font-size:15px;margin-top:10px;}
+.annos{margin-top:20px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px 20px;}
+.annos h2{font-size:18px;margin:0 0 10px;}
+.annos ul{margin:0;padding:0;list-style:none;}
+.annos li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:15px;border-bottom:1px dashed var(--line);}
+.annos li:last-child{border-bottom:none;}
+.variants{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}
+.var{background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:16px;}
+.var h3{margin:0 0 12px;font-size:16px;color:var(--muted);font-weight:600;}
+.err{color:var(--danger);font-size:16px;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="wireframe-index.html">← 返回线框索引</a>　·　<a href="wireframe-P1-记录列表.html">P1 记录列表</a>　·　<a href="wireframe-P3-录音页.html">P3 录音页 →</a></div>
+
+  <div class="specbar">
+    <h1>P2 新建记录（低保真线框）</h1>
+    <div class="sub">依据《技术方案与页面原型规划（人工修改稿）》9.3；Token 依据《UI 设计规范 v1.0》第 2 章。</div>
+    <div class="tags">
+      <span class="tag">优先级 P0</span>
+      <span class="tag">主要操作：开始录音</span>
+      <span class="tag">状态：正常 / 标题为空 / 创建失败</span>
+      <span class="tag">暖调线框 · 颜色仅为占位</span>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="topbar">
+      <span class="back">← 返回</span>
+      <span class="title">新建记录</span>
+      <span class="right">服务：正常</span>
+    </div>
+
+    <div class="content">
+      <h2 class="page-title">新建口述记录</h2>
+      <p class="page-sub">先给这段回忆起个名字，接下来就可以开始录音了。</p>
+
+      <div class="field">
+        <span class="mk abs">1</span>
+        <label for="t">记录标题</label>
+        <div class="input" id="t">例如：我在南昌的童年</div>
+        <div class="hint">标题仅用于你自己区分记录，之后可以随时修改。　2 / 40</div>
+      </div>
+
+      <div style="margin-top:32px;max-width:640px">
+        <div class="ph" style="min-height:120px">辅助说明区（可选）：本页不放其他表单项，保持「一个输入框 + 一个主按钮」的最简结构</div>
+      </div>
+    </div>
+
+    <div class="actionbar">
+      <span class="mk abs" style="top:auto;bottom:-11px;left:auto;right:24px">2</span>
+      <button class="btn btn-primary">开始录音</button>
+    </div>
+  </div>
+
+  <div class="annos">
+    <h2>标注说明</h2>
+    <ul>
+      <li><span class="mk">1</span><span>标题输入框：高 56px、内边距 16px、8px 圆角。标签置于输入框<strong>上方</strong>（16px/500），不使用 placeholder 代替标签；示例文字仅作示意。聚焦时边框转主色并加 2px 外发光。</span></li>
+      <li><span class="mk">2</span><span>底部动作区：全页唯一主按钮「开始录音」（56px）。创建成功后按 9.3 提示「记录已创建，接下来可以开始录音」，并自动进入 P3 录音页。</span></li>
+    </ul>
+  </div>
+
+  <div class="variants">
+    <div class="var">
+      <h3>变体一 · 标题为空（校验失败）</h3>
+      <div class="field" style="max-width:none">
+        <label>记录标题</label>
+        <div class="input" style="border-color:var(--danger)">　</div>
+        <div class="err">请先填写记录标题</div>
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin:12px 0 0">提示文字用暖调危险色 <code>#B5675A</code>，不靠深红边框单独表意。</p>
+    </div>
+
+    <div class="var">
+      <h3>变体二 · 创建失败（本地存储写入异常）</h3>
+      <div style="border-left:4px solid var(--danger);background:var(--bg-h);padding:12px 16px;border-radius:8px">
+        <div style="font-weight:600;margin-bottom:4px">记录创建失败</div>
+        <div style="color:var(--muted)">可能是浏览器存储空间不足，请清理部分旧记录后重试。</div>
+      </div>
+    </div>
+
+    <div class="var">
+      <h3>变体三 · 创建成功（Toast）</h3>
+      <div style="background:var(--bg-h);border:1px solid var(--line);border-radius:10px;padding:12px 16px;text-align:center">
+        记录已创建，接下来可以开始录音
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin:12px 0 0">顶部居中 Toast，2.5 秒自动消失，含文字。</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

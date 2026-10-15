@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>线框 P3 录音页 · myMemory</title>
+<style>
+:root{
+  --p:#B4785A; --p-h:#9E6650; --p-soft:#E8D5C6;
+  --ok:#8A9A5B; --warn:#C99A4E; --danger:#B5675A;
+  --ink:#3D332C; --muted:#7A6A5E; --line:#E3D8CC;
+  --bg:#FDFAF5; --bg-sub:#F7F1E8; --bg-h:#EFE4D6;
+  --link:#9E6650; --ph:#EFE4D6;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:28px 24px 64px;background:var(--bg-sub);color:var(--ink);
+  font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:16px;line-height:1.6;}
+.wrap{max-width:1100px;margin:0 auto;}
+a{color:var(--link);}
+.crumb{font-size:15px;margin-bottom:14px;}
+.specbar{background:var(--bg);border:1px solid var(--line);border-left:6px solid var(--p);
+  border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+.specbar h1{margin:0 0 6px;font-size:22px;}
+.specbar .sub{color:var(--muted);font-size:15px;}
+.specbar .tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--bg-h);color:#6b5a4d;border:1px solid var(--line);}
+.frame{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(61,51,44,.06);}
+.topbar{height:64px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid var(--line);}
+.topbar .back{font-size:15px;color:var(--link);}
+.topbar .title{font-size:18px;font-weight:600;}
+.topbar .right{margin-left:auto;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--bg-sub);}
+.content{position:relative;min-height:460px;padding:32px 24px;}
+.actionbar{height:80px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
+  padding:0 24px;border-top:1px solid var(--line);}
+.btn{border-radius:12px;padding:0 24px;font-size:16px;font-weight:600;display:inline-flex;
+  align-items:center;justify-content:center;white-space:nowrap;}
+.btn-primary{height:56px;background:var(--p);color:var(--bg);border:none;}
+.btn-secondary{height:48px;background:var(--bg);color:var(--p-h);border:1px solid var(--line);font-weight:500;}
+.btn-text{height:48px;background:none;border:none;color:var(--muted);font-weight:500;padding:0 10px;}
+.btn-text.danger{color:var(--danger);}
+.btn[disabled]{opacity:.4;}
+.ph{background:var(--ph);border:1px dashed var(--line);border-radius:10px;display:flex;
+  align-items:center;justify-content:center;color:#8a7565;font-size:14px;text-align:center;padding:8px;}
+.mk{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;
+  background:var(--p);color:var(--bg);font-size:13px;font-weight:700;line-height:1;flex:0 0 auto;}
+.mk.abs{position:absolute;top:-11px;left:-11px;}
+.infobar{position:relative;display:flex;align-items:center;gap:16px;background:var(--bg-sub);
+  border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:20px;}
+.infobar .k{color:var(--muted);font-size:15px;}
+.infobar .v{font-weight:700;}
+.seg{position:relative;display:flex;align-items:center;gap:12px;border:1px solid var(--line);
+  border-radius:10px;padding:12px 16px;margin-bottom:12px;background:var(--bg);}
+.seg .n{font-weight:600;}
+.seg .dur{font-variant-numeric:tabular-nums;color:var(--muted);}
+.seg .st{font-size:14px;border:1px solid var(--line);border-radius:999px;padding:1px 10px;background:var(--bg-sub);color:#6b5a4d;}
+.seg .sp{margin-left:auto;display:flex;gap:6px;}
+.recbox{position:relative;margin:32px 0 8px;text-align:center;border:1px dashed var(--line);
+  border-radius:16px;padding:32px 24px;background:var(--bg-sub);}
+.recbtn{width:96px;height:96px;border-radius:50%;background:var(--p);color:var(--bg);border:none;
+  display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;
+  box-shadow:0 0 0 12px var(--p-soft);}
+.recstate{font-size:20px;font-weight:600;margin-top:26px;}
+.rectime{font-variant-numeric:tabular-nums;font-size:32px;font-weight:700;line-height:1.2;}
+.recsub{color:var(--muted);font-size:15px;margin-top:6px;}
+.secrow{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:20px;}
+.annos{margin-top:20px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px 20px;}
+.annos h2{font-size:18px;margin:0 0 10px;}
+.annos ul{margin:0;padding:0;list-style:none;}
+.annos li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:15px;border-bottom:1px dashed var(--line);}
+.annos li:last-child{border-bottom:none;}
+.states{margin-top:20px;background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.states h2{font-size:18px;margin:0;padding:16px 20px 10px;}
+.states table{width:100%;border-collapse:collapse;font-size:15px;}
+.states th{background:var(--bg-h);color:#6b5a4d;text-align:left;font-weight:600;}
+.states th,.states td{border-top:1px solid var(--line);padding:10px 20px;vertical-align:top;}
+.circ{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--p);vertical-align:-5px;margin-right:6px;}
+.circ.soft{background:var(--p-soft);border:2px solid var(--p);}
+.circ.grey{background:var(--line);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="wireframe-index.html">← 返回线框索引</a>　·　<a href="wireframe-P2-新建记录.html">P2 新建记录</a>　·　<a href="wireframe-P4-转写与初稿.html">P4 转写与初稿 →</a></div>
+
+  <div class="specbar">
+    <h1>P3 录音页（低保真线框）· 核心页面</h1>
+    <div class="sub">依据《技术方案与页面原型规划（人工修改稿）》9.4；录音按钮规格依据《UI 设计规范 v1.0》3.2 节。</div>
+    <div class="tags">
+      <span class="tag">优先级 P0</span>
+      <span class="tag">主要操作：开始录音 / 确认录音</span>
+      <span class="tag">状态：未开始 / 录音中 / 已暂停 / 待确认 / 失败</span>
+      <span class="tag">暖调线框 · 颜色仅为占位</span>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="topbar">
+      <span class="back">← 返回</span>
+      <span class="title">我在南昌的童年</span>
+      <span class="right">服务：正常</span>
+    </div>
+
+    <div class="content">
+      <div class="infobar">
+        <span class="mk abs">1</span>
+        <span class="k">当前记录</span><span class="v">我在南昌的童年</span>
+        <span class="k" style="margin-left:24px">已录片段</span><span class="v">2 段</span>
+        <span class="k" style="margin-left:24px">累计时长</span><span class="v">04:35</span>
+      </div>
+
+      <h2 style="font-size:20px;margin:0 0 12px">已录片段</h2>
+      <div class="seg">
+        <span class="mk abs">2</span>
+        <span class="n">片段 1</span>
+        <span class="dur">03:15</span>
+        <span class="st">已确认</span>
+        <span class="sp">
+          <button class="btn btn-secondary">播放</button>
+          <button class="btn btn-text">重新录制</button>
+          <button class="btn btn-text danger">删除</button>
+        </span>
+      </div>
+      <div class="seg">
+        <span class="n">片段 2</span>
+        <span class="dur">01:20</span>
+        <span class="st">已确认</span>
+        <span class="sp">
+          <button class="btn btn-secondary">播放</button>
+          <button class="btn btn-text">重新录制</button>
+          <button class="btn btn-text danger">删除</button>
+        </span>
+      </div>
+
+      <div class="recbox">
+        <span class="mk abs">3</span>
+        <button class="recbtn">停止</button>
+        <div class="recstate">正在录音 · 00:42</div>
+        <div class="rectime" style="margin-top:8px">00:42</div>
+        <div class="recsub">请用平时说话的速度讲述，不必刻意组织语言</div>
+        <div class="secrow">
+          <span class="mk abs" style="top:auto;bottom:-11px;left:24px">4</span>
+          <button class="btn btn-secondary">暂停</button>
+          <button class="btn btn-secondary">结束本段</button>
+          <button class="btn btn-secondary" disabled>播放</button>
+          <button class="btn btn-text">重新录制</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn btn-text" style="text-decoration:underline">上传音频（备用入口）</button>
+        <div style="color:var(--muted);font-size:14px;margin-top:4px">视觉权重低于录音按钮，仅在无法现场录音时使用</div>
+      </div>
+    </div>
+
+    <div class="actionbar">
+      <span class="mk abs" style="top:auto;bottom:-11px;left:auto;right:24px">5</span>
+      <button class="btn btn-primary">确认录音</button>
+    </div>
+  </div>
+
+  <div class="annos">
+    <h2>标注说明</h2>
+    <ul>
+      <li><span class="mk">1</span><span>信息条：显示当前记录标题、已录片段数与累计时长，数据均来自本地（技术方案 8.4 片段结构）。</span></li>
+      <li><span class="mk">2</span><span>片段列表：每个片段提供播放、重新录制、删除。删除与重新录制均触发二次确认；「重新录制」会覆盖该片段原音频，需明确提示。</span></li>
+      <li><span class="mk">3</span><span><strong>录音圆钮（核心组件）</strong>：直径 96px，主色实心，外圈 12px 淡陶土色呼吸圈。录音中必须同时显示文字「正在录音」与实时时长，不允许只用动效表达状态。</span></li>
+      <li><span class="mk">4</span><span>次级操作行：暂停、结束本段、播放、重新录制，全部为 48px 次按钮或文字按钮，视觉权重明显低于圆钮。「播放」在本段未录制完成时禁用。</span></li>
+      <li><span class="mk">5</span><span>底部动作区：主按钮「确认录音」。<strong>未确认音频前不得自动进入转写</strong>（技术方案 9.4）。本段录制未结束时该按钮保持禁用态并说明原因。</span></li>
+    </ul>
+  </div>
+
+  <div class="states">
+    <h2>录音圆钮的五种状态（对应 UI 设计规范 3.2）</h2>
+    <table>
+      <thead><tr><th>状态</th><th>圆钮外观</th><th>文案与提示</th><th>可用的次级操作</th></tr></thead>
+      <tbody>
+        <tr><td>未开始</td><td><span class="circ"></span>主色实心</td><td>「开始录音」；提示「点击圆钮开始第一段录音」</td><td>上传音频</td></tr>
+        <tr><td>录音中</td><td><span class="circ soft"></span>停止图标 + 呼吸外圈</td><td>「正在录音 · 00:42」+ 实时时长</td><td>暂停、结束本段</td></tr>
+        <tr><td>已暂停</td><td><span class="circ"></span>回到主色</td><td>「已暂停」+ 显示继续入口</td><td>继续、结束本段、重新录制</td></tr>
+        <tr><td>已结束待确认</td><td><span class="circ grey"></span>圆钮隐藏</td><td>「录音时长 03:15」；下方出现两个动作</td><td>播放、重新录制、删除；主按钮「确认录音」启用</td></tr>
+        <tr><td>失败</td><td><span class="circ grey"></span>置灰</td><td>「录音失败，请检查麦克风后重试」</td><td>重试、上传音频</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="states" style="margin-top:20px">
+    <h2>本页异常态（对应技术方案 7.8 / UI 设计规范 5.2）</h2>
+    <table>
+      <thead><tr><th>异常</th><th>页面表现</th><th>文案（原因 + 下一步动作）</th></tr></thead>
+      <tbody>
+        <tr><td>麦克风未授权</td><td>圆钮置灰</td><td>麦克风未授权，请点击浏览器地址栏的锁图标允许后重试</td></tr>
+        <tr><td>录音中断</td><td>已录部分保留为片段</td><td>录音被中断，已保留 01:20 的内容，可以继续录制或确认本段</td></tr>
+        <tr><td>存储空间不足</td><td>圆钮置灰 + 顶部警示条</td><td>本地存储空间不足，请删除部分旧记录后再录音</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>线框 P5 在线编辑页 · myMemory</title>
+<style>
+:root{
+  --p:#B4785A; --p-h:#9E6650; --p-soft:#E8D5C6;
+  --ok:#8A9A5B; --warn:#C99A4E; --danger:#B5675A;
+  --ink:#3D332C; --muted:#7A6A5E; --line:#E3D8CC;
+  --bg:#FDFAF5; --bg-sub:#F7F1E8; --bg-h:#EFE4D6;
+  --link:#9E6650; --ph:#EFE4D6;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:28px 24px 64px;background:var(--bg-sub);color:var(--ink);
+  font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:16px;line-height:1.6;}
+.wrap{max-width:1100px;margin:0 auto;}
+a{color:var(--link);}
+.crumb{font-size:15px;margin-bottom:14px;}
+.specbar{background:var(--bg);border:1px solid var(--line);border-left:6px solid var(--p);
+  border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+.specbar h1{margin:0 0 6px;font-size:22px;}
+.specbar .sub{color:var(--muted);font-size:15px;}
+.specbar .tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--bg-h);color:#6b5a4d;border:1px solid var(--line);}
+.frame{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(61,51,44,.06);}
+.topbar{height:64px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid var(--line);}
+.topbar .back{font-size:15px;color:var(--link);}
+.topbar .title{font-size:18px;font-weight:600;}
+.topbar .right{margin-left:auto;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--bg-sub);}
+.content{position:relative;min-height:440px;padding:32px 24px;}
+.actionbar{height:80px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
+  padding:0 24px;border-top:1px solid var(--line);}
+.btn{border-radius:12px;padding:0 24px;font-size:16px;font-weight:600;display:inline-flex;
+  align-items:center;justify-content:center;white-space:nowrap;}
+.btn-primary{height:56px;background:var(--p);color:var(--bg);border:none;}
+.btn-secondary{height:48px;background:var(--bg);color:var(--p-h);border:1px solid var(--line);font-weight:500;}
+.btn-text{height:48px;background:none;border:none;color:var(--muted);font-weight:500;padding:0 10px;}
+.btn[disabled]{opacity:.4;}
+.mk{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;
+  background:var(--p);color:var(--bg);font-size:13px;font-weight:700;line-height:1;flex:0 0 auto;}
+.mk.abs{position:absolute;top:-11px;left:-11px;}
+.field{position:relative;margin-bottom:24px;}
+.field label{display:block;font-size:16px;font-weight:500;margin-bottom:8px;}
+.input{height:56px;border:1px solid var(--line);border-radius:8px;background:var(--bg);
+  display:flex;align-items:center;padding:0 16px;font-size:18px;color:var(--ink);}
+.textarea{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:16px;
+  min-height:260px;font-size:18px;line-height:1.8;color:#8a7565;}
+.toolbar-lock{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:15px;margin-bottom:8px;}
+.toolbar-lock .chip{border:1px dashed var(--line);border-radius:8px;padding:2px 10px;color:#8a7565;}
+.states{margin-top:20px;background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.states h2{font-size:18px;margin:0;padding:16px 20px 10px;}
+.states table{width:100%;border-collapse:collapse;font-size:15px;}
+.states th{background:var(--bg-h);color:#6b5a4d;text-align:left;font-weight:600;}
+.states th,.states td{border-top:1px solid var(--line);padding:10px 20px;vertical-align:top;}
+.annos{margin-top:20px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px 20px;}
+.annos h2{font-size:18px;margin:0 0 10px;}
+.annos ul{margin:0;padding:0;list-style:none;}
+.annos li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:15px;border-bottom:1px dashed var(--line);}
+.annos li:last-child{border-bottom:none;}
+
+/* 弹窗舞台 */
+.stage{position:relative;margin-top:20px;background:var(--bg);border:1px solid var(--line);
+  border-radius:16px;overflow:hidden;min-height:420px;}
+.stage .dim{filter:blur(1px) opacity(.5);}
+.overlay{position:absolute;inset:0;background:rgba(61,51,44,.34);display:flex;
+  align-items:center;justify-content:center;padding:24px;}
+.modal{background:var(--bg);border:1px solid var(--line);border-radius:16px;width:100%;max-width:520px;
+  padding:24px;box-shadow:0 1px 2px rgba(61,51,44,.06);}
+.modal h3{margin:0 0 12px;font-size:22px;}
+.modal .body{color:var(--muted);font-size:16px;margin-bottom:24px;}
+.modal .foot{display:flex;justify-content:flex-end;gap:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="wireframe-index.html">← 返回线框索引</a>　·　<a href="wireframe-P4-转写与初稿.html">P4 转写与初稿</a>　·　<a href="wireframe-P6-导出确认.html">P6 导出确认 →</a></div>
+
+  <div class="specbar">
+    <h1>P5 在线编辑页（低保真线框）</h1>
+    <div class="sub">依据《技术方案与页面原型规划（人工修改稿）》9.6；编辑与保存流程依据 7.5。</div>
+    <div class="tags">
+      <span class="tag">优先级 P0</span>
+      <span class="tag">主要操作：保存内容</span>
+      <span class="tag">状态：编辑中 / 有未保存改动 / 已保存 / 保存失败</span>
+      <span class="tag">暖调线框 · 颜色仅为占位</span>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="topbar">
+      <span class="back">← 返回</span>
+      <span class="title">编辑内容</span>
+      <span class="right">有未保存改动</span>
+    </div>
+
+    <div class="content">
+      <div class="field">
+        <span class="mk abs">1</span>
+        <label for="t2">标题</label>
+        <div class="input" id="t2">我在南昌的童年</div>
+      </div>
+
+      <div class="field" style="margin-bottom:8px">
+        <span class="mk abs">2</span>
+        <label>正文</label>
+        <div class="toolbar-lock">
+          <span>格式工具：</span>
+          <span class="chip">本页不提供加粗</span>
+          <span class="chip">不提供列表</span>
+          <span class="chip">不提供图片</span>
+          <span style="margin-left:auto">纯文本编辑，共 1,240 字</span>
+        </div>
+        <div class="textarea">
+          [ 正文内容占位 ]<br>
+          直接编辑 AI 生成的传记初稿。此处为普通文本域，不支持富文本格式；<br>
+          修改会保存在本机，原始转写文本不受影响，可随时回到 P4 对照。
+        </div>
+      </div>
+    </div>
+
+    <div class="actionbar">
+      <span class="mk abs" style="top:auto;bottom:-11px;left:auto;right:24px">3</span>
+      <button class="btn btn-text">放弃修改</button>
+      <button class="btn btn-primary">保存内容</button>
+    </div>
+  </div>
+
+  <div class="annos">
+    <h2>标注说明</h2>
+    <ul>
+      <li><span class="mk">1</span><span>标题输入框：18px 正文尺寸，高 56px，可随时修改，与 P2 的标题同源。</span></li>
+      <li><span class="mk">2</span><span>正文编辑区：<strong>普通文本域，不提供任何富文本工具栏</strong>（技术方案 9.6 明确要求）。这里刻意把「不提供」摆在界面上，避免实现时误加编辑器。</span></li>
+      <li><span class="mk">3</span><span>底部动作区：唯一主按钮「保存内容」（56px）。「放弃修改」为文字按钮，需二次确认。顶栏右侧实时显示保存状态。</span></li>
+    </ul>
+  </div>
+
+  <div class="states">
+    <h2>本页状态与异常（对应技术方案 7.5、7.8 与 UI 设计规范 5.2）</h2>
+    <table>
+      <thead><tr><th>状态 / 异常</th><th>页面表现</th><th>文案（原因 + 下一步动作）</th></tr></thead>
+      <tbody>
+        <tr><td>编辑中（无改动）</td><td>顶栏显示「已保存」</td><td>—</td></tr>
+        <tr><td>有未保存改动</td><td>顶栏显示「有未保存改动」；离开时拦截</td><td>当前内容尚未保存，是否保存后离开？</td></tr>
+        <tr><td>保存成功</td><td>顶部 Toast</td><td>内容已保存到本机</td></tr>
+        <tr><td>保存失败</td><td>错误块 + 保留编辑内容</td><td>保存失败：本地存储写入异常，内容仍保留在页面上，请稍后重试</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="stage">
+    <div class="dim" style="padding:32px 24px;background:var(--bg)">
+      <div class="input" style="max-width:520px;margin-bottom:16px">我在南昌的童年</div>
+      <div class="textarea" style="max-width:520px">[ 编辑内容被弹窗遮挡 ]</div>
+    </div>
+    <div class="overlay">
+      <div class="modal">
+        <span class="mk abs" style="top:12px;left:-11px">4</span>
+        <h3>当前内容尚未保存，是否保存后离开？</h3>
+        <div class="body">离开后未保存的修改将丢失。你保存的是本机内容，原始转写文本与录音不受影响。</div>
+        <div class="foot">
+          <button class="btn btn-text">放弃修改</button>
+          <button class="btn btn-secondary">取消</button>
+          <button class="btn btn-primary" style="height:48px">保存并离开</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annos" style="margin-top:16px">
+    <h2>离页确认弹窗说明</h2>
+    <ul>
+      <li><span class="mk">4</span><span>存在未保存改动时离开页面即触发（技术方案 9.6）。弹窗含三个动作：放弃修改（文字按钮，危险语义）、取消（次按钮）、保存并离开（主按钮）。弹窗关闭后焦点回到触发位置。</span></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

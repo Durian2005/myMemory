@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>线框 P6 导出确认 · myMemory</title>
+<style>
+:root{
+  --p:#B4785A; --p-h:#9E6650; --p-soft:#E8D5C6;
+  --ok:#8A9A5B; --warn:#C99A4E; --danger:#B5675A;
+  --ink:#3D332C; --muted:#7A6A5E; --line:#E3D8CC;
+  --bg:#FDFAF5; --bg-sub:#F7F1E8; --bg-h:#EFE4D6;
+  --link:#9E6650; --ph:#EFE4D6;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:28px 24px 64px;background:var(--bg-sub);color:var(--ink);
+  font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:16px;line-height:1.6;}
+.wrap{max-width:1100px;margin:0 auto;}
+a{color:var(--link);}
+.crumb{font-size:15px;margin-bottom:14px;}
+.specbar{background:var(--bg);border:1px solid var(--line);border-left:6px solid var(--p);
+  border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+.specbar h1{margin:0 0 6px;font-size:22px;}
+.specbar .sub{color:var(--muted);font-size:15px;}
+.specbar .tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--bg-h);color:#6b5a4d;border:1px solid var(--line);}
+.btn{border-radius:12px;padding:0 24px;font-size:16px;font-weight:600;display:inline-flex;
+  align-items:center;justify-content:center;white-space:nowrap;}
+.btn-primary{height:56px;background:var(--p);color:var(--bg);border:none;}
+.btn-secondary{height:48px;background:var(--bg);color:var(--p-h);border:1px solid var(--line);font-weight:500;}
+.btn-text{height:48px;background:none;border:none;color:var(--muted);font-weight:500;padding:0 10px;}
+.btn[disabled]{opacity:.4;}
+.mk{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;
+  background:var(--p);color:var(--bg);font-size:13px;font-weight:700;line-height:1;flex:0 0 auto;}
+.mk.abs{position:absolute;top:-11px;left:-11px;}
+.stage{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:520px;}
+.stage .bg{position:absolute;inset:0;padding:32px 24px;opacity:.42;filter:blur(1px);}
+.overlay{position:relative;inset:0;min-height:520px;background:rgba(61,51,44,.34);display:flex;
+  align-items:center;justify-content:center;padding:28px;}
+.modal{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:16px;width:100%;max-width:560px;
+  padding:24px;box-shadow:0 1px 2px rgba(61,51,44,.06);}
+.modal h3{margin:0 0 16px;font-size:22px;}
+.summary{border:1px solid var(--line);border-radius:10px;background:var(--bg-sub);padding:16px;margin-bottom:16px;}
+.summary .row{display:flex;gap:12px;padding:6px 0;font-size:16px;border-bottom:1px dashed var(--line);}
+.summary .row:last-child{border-bottom:none;}
+.summary .k{color:var(--muted);width:110px;flex:0 0 auto;}
+.summary .v{font-weight:600;}
+.modal .tip{color:var(--muted);font-size:15px;margin-bottom:20px;}
+.modal .foot{display:flex;justify-content:flex-end;gap:16px;}
+.err{background:var(--bg-h);border-left:4px solid var(--danger);border-radius:8px;padding:12px 16px;
+  margin-bottom:20px;font-size:15px;}
+.err>b{display:block;margin-bottom:4px;}
+.annos{margin-top:20px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px 20px;}
+.annos h2{font-size:18px;margin:0 0 10px;}
+.annos ul{margin:0;padding:0;list-style:none;}
+.annos li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:15px;border-bottom:1px dashed var(--line);}
+.annos li:last-child{border-bottom:none;}
+.variants{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;}
+.var{background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:16px;}
+.var h3{margin:0 0 12px;font-size:16px;color:var(--muted);font-weight:600;}
+.var .mini{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg-sub);}
+.input{height:56px;border:1px solid var(--line);border-radius:8px;background:var(--bg);
+  display:flex;align-items:center;padding:0 16px;color:#a89583;max-width:420px;}
+.textarea{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:16px;
+  min-height:180px;max-width:420px;color:#8a7565;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="wireframe-index.html">← 返回线框索引</a>　·　<a href="wireframe-P5-在线编辑.html">P5 在线编辑</a></div>
+
+  <div class="specbar">
+    <h1>P6 导出确认（低保真线框）</h1>
+    <div class="sub">依据《技术方案与页面原型规划（人工修改稿）》9.7；导出流程依据 7.6，导出实现依据 8.3 决策三。</div>
+    <div class="tags">
+      <span class="tag">优先级 P0</span>
+      <span class="tag">主要操作：导出文档</span>
+      <span class="tag">状态：校验中 / 生成中 / 完成 / 校验失败 / 导出失败</span>
+      <span class="tag">以弹窗呈现</span>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="bg">
+      <h2 style="font-size:26px;margin:0 0 6px">我的口述记录</h2>
+      <p style="color:var(--muted);margin:0 0 24px">共 3 条记录　·　所有内容仅保存在本机浏览器中</p>
+      <div style="border:1px solid var(--line);border-radius:12px;padding:24px;margin-bottom:16px">
+        <div style="font-size:24px;font-weight:700">我在南昌的童年</div>
+        <div style="color:var(--muted);font-size:15px">更新于 2026-10-08 21:40　·　已保存</div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:12px;padding:24px">
+        <div style="font-size:24px;font-weight:700">在南京读书的日子</div>
+        <div style="color:var(--muted);font-size:15px">更新于 2026-10-07 19:12　·　待转写</div>
+      </div>
+    </div>
+
+    <div class="overlay">
+      <div class="modal">
+        <span class="mk abs">1</span>
+        <h3>导出文档</h3>
+
+        <div class="summary">
+          <span class="mk abs" style="top:-11px;left:-11px">2</span>
+          <div class="row"><span class="k">标题</span><span class="v">我在南昌的童年</span></div>
+          <div class="row"><span class="k">正文字数</span><span class="v">1,240 字</span></div>
+          <div class="row"><span class="k">录音片段</span><span class="v">3 段 · 累计 04:35</span></div>
+          <div class="row"><span class="k">导出格式</span><span class="v">.docx（Word 文档）</span></div>
+          <div class="row"><span class="k">预计文件名</span><span class="v">我在南昌的童年.docx</span></div>
+        </div>
+
+        <div class="tip">正文摘要：1963 年的夏天，我出生在南昌老城区的一条小巷里……（此处显示正文前 3 行摘要）</div>
+
+        <div class="foot">
+          <span class="mk abs" style="top:auto;bottom:16px;left:-11px">3</span>
+          <button class="btn btn-text">取消</button>
+          <button class="btn btn-primary">导出文档</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annos">
+    <h2>标注说明</h2>
+    <ul>
+      <li><span class="mk">1</span><span>本页以<strong>弹窗</strong>形式呈现（技术方案 9.7），背后列表页做遮罩与模糊。弹窗 16px 圆角，焦点在打开时移入弹窗，关闭后回到触发元素。</span></li>
+      <li><span class="mk">2</span><span>摘要区：展示将要导出的标题、正文字数、片段信息、格式与预计文件名，让用户在生成前确认内容范围。</span></li>
+      <li><span class="mk">3</span><span>底部按钮：主按钮位于弹窗底部<strong>右侧</strong>（与 4.2 节「弹窗类页面主按钮在弹窗底部右侧」一致）。导出进行中主按钮文字替换为「正在生成文档…」，且禁止重复点击。</span></li>
+    </ul>
+  </div>
+
+  <div class="variants">
+    <div class="var">
+      <h3>变体一 · 校验失败（标题为空）</h3>
+      <div class="mini">
+        <div class="err"><b>标题为空，无法导出</b>请先返回编辑页填写记录标题。 <a href="wireframe-P5-在线编辑.html">前往编辑</a></div>
+        <div class="foot" style="display:flex;justify-content:flex-end;gap:12px">
+          <button class="btn btn-text">取消</button>
+          <button class="btn btn-primary" style="height:48px" disabled>导出文档</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="var">
+      <h3>变体二 · 校验失败（正文为空）</h3>
+      <div class="mini">
+        <div class="err"><b>正文为空，无法导出</b>请先完成转写与初稿生成，或手动填写正文内容。</div>
+      </div>
+    </div>
+
+    <div class="var">
+      <h3>变体三 · 校验失败（存在未保存修改）</h3>
+      <div class="mini">
+        <div class="err"><b>存在未保存的修改</b>请先保存当前内容，再进行导出，避免导出的版本与页面不一致。</div>
+      </div>
+    </div>
+
+    <div class="var">
+      <h3>变体四 · 生成中</h3>
+      <div class="mini" style="text-align:center">
+        <div style="font-size:16px;color:var(--muted);margin-bottom:16px">正在生成文档，请稍候…</div>
+        <button class="btn btn-primary" style="height:48px" disabled>正在生成文档…</button>
+      </div>
+    </div>
+
+    <div class="var">
+      <h3>变体五 · 完成</h3>
+      <div class="mini" style="text-align:center">
+        <div style="font-size:16px;margin-bottom:16px">文档已导出，请在下载目录中查看。</div>
+        <button class="btn btn-secondary">再次导出</button>
+      </div>
+    </div>
+
+    <div class="var">
+      <h3>变体六 · 导出失败</h3>
+      <div class="mini">
+        <div class="err"><b>文档生成失败</b>服务暂时不可用，你的内容未受影响，可稍后重试。</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
