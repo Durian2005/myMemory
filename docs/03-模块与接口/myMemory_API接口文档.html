@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>myMemory 标准化 API 接口文档</title>
+<style>
+@page { size: A4; margin: 2.2cm 2.4cm 2.2cm 2.4cm; }
+:root { --ink:#243447; --muted:#617083; --blue:#285f8f; --line:#d8e1ea; --soft:#f3f7fa; --accent:#eaf2f8; }
+* { box-sizing:border-box; }
+body { font-family:"Microsoft YaHei","SimSun",sans-serif; color:var(--ink); font-size:10.5pt; line-height:1.75; margin:0; }
+.cover { min-height:22cm; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; page-break-after:always; }
+.cover .eyebrow { color:var(--blue); font-size:12pt; letter-spacing:2px; margin-bottom:22px; }
+.cover h1 { font-size:26pt; line-height:1.35; margin:0 0 18px; color:#193b59; }
+.cover .subtitle { font-size:15pt; color:var(--muted); margin-bottom:70px; }
+.cover .meta { color:var(--muted); font-size:10.5pt; }
+.doc-header { border-bottom:1px solid var(--line); color:var(--muted); font-size:9pt; padding-bottom:7px; margin-bottom:24px; }
+.doc-footer { border-top:1px solid var(--line); color:var(--muted); font-size:9pt; padding-top:7px; margin-top:24px; text-align:center; }
+h1 { color:#193b59; font-size:20pt; margin:26px 0 13px; padding-bottom:6px; border-bottom:2px solid var(--blue); page-break-before:always; }
+h1:first-of-type { page-break-before:auto; }
+h2 { color:var(--blue); font-size:15pt; margin:22px 0 8px; }
+h3 { color:#3d617f; font-size:12pt; margin:16px 0 5px; }
+p { margin:7px 0; }
+blockquote { margin:14px 0; padding:10px 16px; background:var(--accent); border-left:4px solid var(--blue); color:#35516b; font-family:Consolas,"Courier New",monospace; font-size:9.5pt; }
+ul, ol { margin:6px 0 10px 24px; padding-left:18px; }
+li { margin:3px 0; }
+strong { color:#183d5d; }
+table { width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:9.5pt; page-break-inside:avoid; }
+th { background:#eaf2f8; color:#244a69; font-weight:bold; }
+th, td { border:1px solid var(--line); padding:7px 8px; vertical-align:top; }
+tr:nth-child(even) td { background:#fbfcfd; }
+code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding:1px 4px; color:#814c22; }
+.note { background:#fff9e8; border-left:4px solid #d6a72c; padding:9px 13px; margin:12px 0; }
+</style>
+</head>
+<body>
+<section class="cover" role="cover">
+  <div class="eyebrow">Vibe-Coding 实验3 · 交付物②</div>
+  <h1>myMemory<br>标准化 API 接口文档</h1>
+  <div class="subtitle">口述记录生成传记系统 · 网页微缩版</div>
+  <div class="meta">依据：《后端模块划分清单》B01–B06｜阶段：详细设计（接口定义）</div>
+</section>
+<section role="body">
+<header class="doc-header">myMemory 口述记录生成传记系统（网页微缩版）｜标准化 API 接口文档</header>
+
+<h1>1. 说明</h1>
+<h2>1.1 文档目的</h2>
+<p>本文档定义 myMemory 后端对所有接口的调用契约，逐条给出<strong>接口名称、请求方式、接口路径、关键入参、返回参数、业务错误码</strong>六项字段，并给出本项目专属的业务错误码表，作为前后端联调、测试与验收的唯一依据。</p>
+<p>接口范围与《后端模块划分清单》中的 B01–B06 模块一一对应；接口数量刻意保持精简，因为记录与片段的增删改查全部在浏览器本地完成，不经过后端。</p>
+<h2>1.2 接口设计约定</h2>
+<ol>
+<li><strong>RESTful 风格：</strong>资源用名词复数，动作用 HTTP 方法表达；不出现 <code>/getXxx</code>、<code>/doXxx</code> 一类动词路径。</li>
+<li><strong>无状态：</strong>后端不写 Cookie、不建会话、不持久化任何用户数据；相同输入必得相同结果。</li>
+<li><strong>UTF-8：</strong>请求与响应统一使用 UTF-8；JSON 接口的 <code>Content-Type</code> 为 <code>application/json</code>。</li>
+<li><strong>业务错误码：</strong>不使用通用状态码代替业务语义，每个可预期的失败场景都有专属错误码，且随响应返回面向用户的通俗文案。</li>
+<li><strong>不暴露外部依赖：</strong>响应体不得出现第三方服务地址、密钥与用户音频内容。</li>
+</ol>
+<h2>1.3 接口总览</h2>
+<table><thead><tr><th>编号</th><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>承载模块</th><th>对应业务动作</th></tr></thead><tbody>
+<tr><td>I01</td><td>服务健康检查</td><td>GET</td><td>/api/health</td><td>B06</td><td>服务可用性探测（支撑本地模式降级）</td></tr>
+<tr><td>I02</td><td>上传口述素材并转写</td><td>POST</td><td>/api/transcriptions</td><td>B01 + B02</td><td>上传 / 录入口述素材</td></tr>
+<tr><td>I03</td><td>生成传记初稿</td><td>POST</td><td>/api/polish</td><td>B03</td><td>AI 生成传记初稿</td></tr>
+<tr><td>I04</td><td>导出 DOCX 文档</td><td>POST</td><td>/api/exports</td><td>B04</td><td>导出文档</td></tr>
+</tbody></table>
+<div class="note"><strong>关于「新建传记项目」：</strong>该业务动作由前端在浏览器本地完成（写入 IndexedDB），后端不持久化用户数据，因此<strong>不设对应接口</strong>。详见第 5 章的业务动作对照表。</div>
+
+<h1>2. 接口详情</h1>
+<h2>2.1 I01 服务健康检查</h2>
+<table><thead><tr><th>字段</th><th>内容</th></tr></thead><tbody>
+<tr><td>接口名称</td><td>服务健康检查</td></tr>
+<tr><td>请求方式</td><td>GET</td></tr>
+<tr><td>接口路径</td><td><code>/api/health</code></td></tr>
+<tr><td>关键入参</td><td>无</td></tr>
+<tr><td>返回参数</td><td>status（ok / degraded）、version（后端版本号）、capabilities.transcription（布尔，转写能力是否可用）、capabilities.generation（布尔，生成能力是否可用）、timestamp（服务时间，ISO 8601）</td></tr>
+<tr><td>业务错误码</td><td>MYM_5001 服务内部异常</td></tr>
+<tr><td>调用时机</td><td>前端启动时调用一次，之后每 60 秒轮询一次</td></tr>
+<tr><td>幂等性</td><td>天然幂等</td></tr>
+</tbody></table>
+<p><strong>返回示例：</strong></p>
+<blockquote>{"status":"ok","version":"1.0.0","capabilities":{"transcription":true,"generation":true},"timestamp":"2026-10-15T19:30:00+08:00"}</blockquote>
+<div class="note"><strong>降级约定：</strong>当 <code>capabilities.transcription</code> 或 <code>capabilities.generation</code> 为 false，或本接口请求失败时，前端进入「本地模式」：录音、编辑、导出照常可用，仅转写与初稿生成入口置灰并说明原因。</div>
+
+<h2>2.2 I02 上传口述素材并转写</h2>
+<table><thead><tr><th>字段</th><th>内容</th></tr></thead><tbody>
+<tr><td>接口名称</td><td>上传口述素材并转写</td></tr>
+<tr><td>请求方式</td><td>POST</td></tr>
+<tr><td>接口路径</td><td><code>/api/transcriptions</code></td></tr>
+<tr><td>请求编码</td><td><code>multipart/form-data</code>（音频以二进制上传）</td></tr>
+<tr><td>关键入参</td><td>见下方入参表</td></tr>
+<tr><td>返回参数</td><td>见下方返回参数表</td></tr>
+<tr><td>业务错误码</td><td>MYM_1001 / MYM_1002 / MYM_1003 / MYM_1004 / MYM_1005 / MYM_2001 / MYM_2002 / MYM_2003 / MYM_5002</td></tr>
+<tr><td>幂等性</td><td>对同一音频内容与同一 segmentId 的重复请求返回相同结果（服务端按音频指纹缓存）</td></tr>
+</tbody></table>
+<h3>关键入参</h3>
+<table><thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead><tbody>
+<tr><td>audio</td><td>file</td><td>是</td><td>音频二进制，支持 webm / mp3 / wav / m4a；单段不超过 30 分钟</td></tr>
+<tr><td>segmentId</td><td>string</td><td>是</td><td>片段标识，由前端生成，用于把结果回填到对应片段</td></tr>
+<tr><td>storyId</td><td>string</td><td>是</td><td>所属记录标识，仅用于日志关联，后端不做持久化</td></tr>
+<tr><td>durationSeconds</td><td>number</td><td>是</td><td>前端测量的片段时长（秒），用于与识别结果交叉校验</td></tr>
+<tr><td>audioFormat</td><td>string</td><td>否</td><td>音频格式；缺省时由服务端嗅探文件头判断</td></tr>
+</tbody></table>
+<h3>返回参数</h3>
+<table><thead><tr><th>参数名</th><th>类型</th><th>说明</th></tr></thead><tbody>
+<tr><td>segmentId</td><td>string</td><td>原样返回入参中的片段标识，便于前端定位</td></tr>
+<tr><td>transcribedText</td><td>string</td><td>原始转写文本，保留口语语气；可能为空字符串，此时同时返回 MYM_2003</td></tr>
+<tr><td>durationSeconds</td><td>number</td><td>服务端识别出的音频时长，用于前端核对是否与录音时长一致</td></tr>
+<tr><td>engine</td><td>string</td><td>识别引擎标识，仅用于排查，不含服务地址与密钥</td></tr>
+<tr><td>finishedAt</td><td>string</td><td>完成时间（ISO 8601）</td></tr>
+</tbody></table>
+<div class="note"><strong>重要约束：</strong>本接口<strong>只返回原始转写文本，不做任何润色与改写</strong>；返回结果不回写前端已有内容，由前端负责写入本地存储。原始转写文本一旦写入即不可被 AI 覆盖（技术方案 8.4 数据处理原则）。</div>
+
+<h2>2.3 I03 生成传记初稿</h2>
+<table><thead><tr><th>字段</th><th>内容</th></tr></thead><tbody>
+<tr><td>接口名称</td><td>生成传记初稿（润色 / 多段合并）</td></tr>
+<tr><td>请求方式</td><td>POST</td></tr>
+<tr><td>接口路径</td><td><code>/api/polish</code></td></tr>
+<tr><td>请求编码</td><td><code>application/json</code></td></tr>
+<tr><td>关键入参</td><td>见下方入参表</td></tr>
+<tr><td>返回参数</td><td>见下方返回参数表</td></tr>
+<tr><td>业务错误码</td><td>MYM_1006 / MYM_1007 / MYM_3001 / MYM_3002 / MYM_3003 / MYM_3004 / MYM_5002</td></tr>
+<tr><td>幂等性</td><td>对同一 sourceText 与同一 mode 返回稳定结果（按文本哈希缓存）</td></tr>
+</tbody></table>
+<h3>关键入参</h3>
+<table><thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead><tbody>
+<tr><td>storyId</td><td>string</td><td>是</td><td>记录标识，仅用于日志关联</td></tr>
+<tr><td>storyTitle</td><td>string</td><td>是</td><td>记录标题，作为生成时的上下文</td></tr>
+<tr><td>sourceText</td><td>string</td><td>是</td><td><strong>原始转写文本</strong>，本次生成唯一的内容来源</td></tr>
+<tr><td>mode</td><td>string</td><td>是</td><td>取值为 <code>polish</code>（单段润色）或 <code>merge</code>（多段合并为完整初稿）</td></tr>
+<tr><td>styleHint</td><td>string</td><td>否</td><td>风格提示；本项目默认不启用，第一版不接受该参数</td></tr>
+</tbody></table>
+<h3>返回参数</h3>
+<table><thead><tr><th>参数名</th><th>类型</th><th>说明</th></tr></thead><tbody>
+<tr><td>polishedText</td><td>string</td><td>传记初稿正文，可编辑</td></tr>
+<tr><td>charCount</td><td>number</td><td>初稿字数，供前端展示与导出前校验</td></tr>
+<tr><td>model</td><td>string</td><td>模型标识，仅用于排查</td></tr>
+<tr><td>generatedAt</td><td>string</td><td>生成时间（ISO 8601）</td></tr>
+<tr><td>sourceTextHash</td><td>string</td><td>入参原始文本的哈希值，供前端核对「本次初稿对应的是哪一版原文」</td></tr>
+</tbody></table>
+<div class="note"><strong>事实约束：</strong>本接口的提示词中必须包含「不得虚构人物、时间、地点、事件；无法确定的信息保持原样，不作推测」。返回的 <code>sourceTextHash</code> 用于保证初稿与原文可追溯；若生成内容与原文的事实要素差异过大，返回 MYM_3004，由用户对照原文决定是否采用。</div>
+
+<h2>2.4 I04 导出 DOCX 文档</h2>
+<table><thead><tr><th>字段</th><th>内容</th></tr></thead><tbody>
+<tr><td>接口名称</td><td>导出 DOCX 文档</td></tr>
+<tr><td>请求方式</td><td>POST</td></tr>
+<tr><td>接口路径</td><td><code>/api/exports</code></td></tr>
+<tr><td>请求编码</td><td><code>application/json</code></td></tr>
+<tr><td>关键入参</td><td>见下方入参表</td></tr>
+<tr><td>返回参数</td><td>成功时直接返回 <strong>DOCX 文件字节流</strong>，不返回 JSON：响应头 Content-Type 为 application/vnd.openxmlformats-officedocument.wordprocessingml.document，Content-Disposition 为 attachment，文件名按 UTF-8 编码；失败时返回统一 JSON 错误体</td></tr>
+<tr><td>业务错误码</td><td>MYM_1008 / MYM_1009 / MYM_4001 / MYM_4002 / MYM_5002</td></tr>
+<tr><td>幂等性</td><td>对同一输入产出内容相同的文档（导出时间戳字段除外）</td></tr>
+</tbody></table>
+<h3>关键入参</h3>
+<table><thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead><tbody>
+<tr><td>title</td><td>string</td><td>是</td><td>传记标题，同时作为导出文件名</td></tr>
+<tr><td>content</td><td>string</td><td>是</td><td>传记正文（用户在编辑页确认后的内容）</td></tr>
+<tr><td>segments</td><td>array</td><td>否</td><td>片段摘要数组，每项含 segmentId 与 durationSeconds，用于在文末附素材清单</td></tr>
+<tr><td>exportedAt</td><td>string</td><td>否</td><td>导出时间，缺省由服务端补为当前时间</td></tr>
+</tbody></table>
+<div class="note"><strong>内容安全：</strong>本接口不落盘、不保留服务端副本；生成完成后立即释放内存中的文档字节流。响应体中的文档内容只来源于本次请求，不读取任何服务端存储。</div>
+
+<h1>3. 业务错误码</h1>
+<h2>3.1 编码规则</h2>
+<ul>
+<li>统一前缀 <code>MYM_</code>（myMemory），后接 4 位数字。</li>
+<li>第 1 位表示类别，后 3 位为该类别内的序号：<code>1xxx</code> 输入与素材校验类；<code>2xxx</code> 语音转写类；<code>3xxx</code> AI 生成类；<code>4xxx</code> 文档导出类；<code>5xxx</code> 服务与通用类。</li>
+<li>每个错误码固定绑定一个 HTTP 状态码、一条面向用户的中文文案（遵循「原因 + 下一步动作」句式）以及一个「是否建议重试」标记。</li>
+</ul>
+<h2>3.2 错误码总表</h2>
+<table><thead><tr><th>错误码</th><th>类别</th><th>HTTP</th><th>含义</th><th>面向用户的文案</th><th>可重试</th></tr></thead><tbody>
+<tr><td>MYM_1001</td><td>输入</td><td>400</td><td>未收到音频数据</td><td>没有收到录音内容，请重新录制后再试</td><td>否</td></tr>
+<tr><td>MYM_1002</td><td>输入</td><td>415</td><td>音频格式不支持</td><td>当前录音格式不受支持，请改用网页录音或上传 mp3 / wav 文件</td><td>否</td></tr>
+<tr><td>MYM_1003</td><td>输入</td><td>413</td><td>音频文件过大</td><td>这段录音太大了，请分成几段较短的内容分别录制</td><td>否</td></tr>
+<tr><td>MYM_1004</td><td>输入</td><td>422</td><td>音频为空或无法解码</td><td>录音内容为空或已损坏，请重新录制这一段</td><td>否</td></tr>
+<tr><td>MYM_1005</td><td>输入</td><td>422</td><td>音频时长超出上限</td><td>单段录音请控制在 30 分钟以内</td><td>否</td></tr>
+<tr><td>MYM_1006</td><td>输入</td><td>422</td><td>提交的文本为空</td><td>没有可生成的内容，请先完成转写或手动填写正文</td><td>否</td></tr>
+<tr><td>MYM_1007</td><td>输入</td><td>413</td><td>文本超出长度上限</td><td>内容过长，请分段生成后再合并</td><td>否</td></tr>
+<tr><td>MYM_1008</td><td>输入</td><td>422</td><td>导出标题为空</td><td>请先填写记录标题，再导出文档</td><td>否</td></tr>
+<tr><td>MYM_1009</td><td>输入</td><td>422</td><td>导出正文为空</td><td>正文为空无法导出，请先完成初稿或手动填写内容</td><td>否</td></tr>
+<tr><td>MYM_2001</td><td>转写</td><td>503</td><td>转写服务不可用</td><td>语音转写服务暂时不可用，音频已保存在本地，可稍后重试</td><td>是</td></tr>
+<tr><td>MYM_2002</td><td>转写</td><td>504</td><td>转写超时</td><td>转写用时过长已中断，音频已保留，可重试或改用手动输入</td><td>是</td></tr>
+<tr><td>MYM_2003</td><td>转写</td><td>422</td><td>转写结果为空</td><td>没有识别出有效内容，请检查录音音量或周围环境后重试</td><td>是</td></tr>
+<tr><td>MYM_3001</td><td>生成</td><td>503</td><td>AI 服务不可用</td><td>初稿生成服务暂时不可用，原始转写文本已完整保留，可稍后重试</td><td>是</td></tr>
+<tr><td>MYM_3002</td><td>生成</td><td>504</td><td>AI 生成超时</td><td>生成用时过长已中断，原始转写文本未受影响，可重试</td><td>是</td></tr>
+<tr><td>MYM_3003</td><td>生成</td><td>422</td><td>AI 返回内容为空</td><td>未能生成初稿，原始转写文本已保留，可稍后重试</td><td>是</td></tr>
+<tr><td>MYM_3004</td><td>生成</td><td>409</td><td>生成内容疑似偏离原始事实</td><td>初稿可能与原始讲述不一致，请对照原文核对人物、时间、地点与事件</td><td>否</td></tr>
+<tr><td>MYM_4001</td><td>导出</td><td>500</td><td>文档生成失败</td><td>文档生成失败，你的内容未受影响，请稍后重试</td><td>是</td></tr>
+<tr><td>MYM_4002</td><td>导出</td><td>413</td><td>导出内容超出上限</td><td>内容过长无法一次导出，请精简后再试</td><td>否</td></tr>
+<tr><td>MYM_5001</td><td>通用</td><td>500</td><td>服务内部异常</td><td>服务出现异常，请稍后重试；若持续出现请重启后端服务</td><td>是</td></tr>
+<tr><td>MYM_5002</td><td>通用</td><td>503</td><td>服务未就绪</td><td>后端服务尚未就绪，请确认后端已启动</td><td>是</td></tr>
+<tr><td>MYM_5003</td><td>通用</td><td>429</td><td>请求过于频繁</td><td>操作过于频繁，请稍候几秒再试</td><td>是</td></tr>
+</tbody></table>
+<h2>3.3 HTTP 状态码使用约定</h2>
+<table><thead><tr><th>HTTP</th><th>语义</th><th>本项目中的使用场景</th></tr></thead><tbody>
+<tr><td>200</td><td>成功</td><td>正常返回数据或文档字节流</td></tr>
+<tr><td>400</td><td>请求参数错误</td><td>缺少必填字段、字段类型错误</td></tr>
+<tr><td>409</td><td>状态冲突</td><td>生成内容疑似偏离原始事实，需用户人工核对</td></tr>
+<tr><td>413</td><td>载荷过大</td><td>音频或文本超出长度上限</td></tr>
+<tr><td>415</td><td>媒体类型不支持</td><td>音频格式不在白名单内</td></tr>
+<tr><td>422</td><td>语义校验失败</td><td>内容为空、无法解码、转写结果为空</td></tr>
+<tr><td>429</td><td>请求过于频繁</td><td>单位时间内请求次数过多</td></tr>
+<tr><td>500</td><td>服务内部错误</td><td>未预期异常、文档生成失败</td></tr>
+<tr><td>503</td><td>服务不可用</td><td>外部依赖不可用、后端服务尚未就绪</td></tr>
+<tr><td>504</td><td>上游超时</td><td>转写或生成调用超时</td></tr>
+</tbody></table>
+
+<h1>4. 通用约定</h1>
+<h2>4.1 超时与重试</h2>
+<table><thead><tr><th>接口</th><th>超时</th><th>重试上限</th><th>重试策略</th></tr></thead><tbody>
+<tr><td>GET /api/health</td><td>3 秒</td><td>0</td><td>不重试，由前端按 60 秒轮询</td></tr>
+<tr><td>POST /api/transcriptions</td><td>90 秒</td><td>2</td><td>指数退避 2 秒 / 5 秒；仅对 503 与 504 重试</td></tr>
+<tr><td>POST /api/polish</td><td>60 秒</td><td>2</td><td>指数退避 2 秒 / 5 秒；仅对 503 与 504 重试</td></tr>
+<tr><td>POST /api/exports</td><td>20 秒</td><td>1</td><td>仅对 500 重试</td></tr>
+</tbody></table>
+<p>重试上限到达后，前端按返回的错误码展示提示，并允许用户手动再次触发，不进行无上限自动重试。</p>
+<h2>4.2 幂等性</h2>
+<ul>
+<li><code>GET /api/health</code> 天然幂等。</li>
+<li>三个 POST 接口对同一输入返回稳定结果：转写按音频指纹缓存，生成按 <code>sourceText</code> 哈希缓存，导出按标题与正文哈希缓存。</li>
+<li>幂等设计的目的有两个：避免用户重复点击造成重复计费；保证同一素材多次提交得到一致结果，便于对照与排查。</li>
+</ul>
+<h2>4.3 错误响应体格式</h2>
+<p>所有失败响应统一返回如下 JSON 结构：</p>
+<blockquote>{"code":"MYM_2001","message":"语音转写服务暂时不可用，音频已保存在本地，可稍后重试","detail":"upstream asr returned 503","retryable":true,"requestId":"a1b2c3d4"}</blockquote>
+<table><thead><tr><th>字段</th><th>类型</th><th>必返回</th><th>说明</th></tr></thead><tbody>
+<tr><td>code</td><td>string</td><td>是</td><td>业务错误码，取值见第 3 章</td></tr>
+<tr><td>message</td><td>string</td><td>是</td><td>面向用户的中文说明，遵循「原因 + 下一步动作」句式，可直接展示</td></tr>
+<tr><td>detail</td><td>string</td><td>否</td><td>面向开发者的补充信息；不得包含密钥、外部服务地址与用户音频内容</td></tr>
+<tr><td>retryable</td><td>boolean</td><td>是</td><td>是否建议重试，前端据此决定是否显示重试按钮</td></tr>
+<tr><td>requestId</td><td>string</td><td>是</td><td>单次请求标识，便于对照日志排查</td></tr>
+</tbody></table>
+<h2>4.4 其他约定</h2>
+<ul>
+<li>后端<strong>无状态</strong>：不写 Cookie、不建会话、不落盘用户数据。</li>
+<li><strong>不做鉴权</strong>：服务仅监听本机回环地址，供同一台机器上的前端调用。</li>
+<li>外部服务密钥通过环境变量注入，只出现在 B05 外部服务网关模块中，前端与响应体均不可见。</li>
+<li>日志中不得记录音频内容与正文内容，只记录错误码、模块与 requestId。</li>
+</ul>
+
+<h1>5. 业务动作与接口对照</h1>
+<table><thead><tr><th>业务动作</th><th>承载层</th><th>对应接口</th><th>说明</th></tr></thead><tbody>
+<tr><td>新建传记项目</td><td>前端本地</td><td>无</td><td>写入浏览器 IndexedDB。后端不持久化用户数据，故不设接口；若强行增设写入接口，将与技术方案 8.3 决策一冲突</td></tr>
+<tr><td>上传 / 录入口述素材</td><td>后端代理</td><td>POST /api/transcriptions</td><td>前端采集与本地存储，后端负责校验与转写</td></tr>
+<tr><td>AI 生成传记初稿</td><td>后端代理</td><td>POST /api/polish</td><td>由后端代理调用，前端不接触密钥</td></tr>
+<tr><td>导出文档</td><td>后端生成</td><td>POST /api/exports</td><td>后端组装 OOXML 生成 DOCX</td></tr>
+<tr><td>服务可用性探测</td><td>后端</td><td>GET /api/health</td><td>支撑「本地模式」降级：后端不可用时，录音、编辑、导出仍可正常使用</td></tr>
+</tbody></table>
+<div class="note"><strong>接口完整性说明：</strong>本项目的接口只覆盖「需要外部智能能力或需要生成文件」的动作。记录增删改查、音频存储、文本编辑等全部由浏览器本地承担，因此不产生接口 —— 这是既定架构的结果，不是设计遗漏。</div>
+
+<footer class="doc-footer">myMemory 标准化 API 接口文档｜Vibe-Coding 实验3 交付物②｜依据《后端模块划分清单》B01–B06 编制</footer>
+</section>
+</body>
+</html>

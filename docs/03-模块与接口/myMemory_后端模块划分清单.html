@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>myMemory 后端模块划分清单</title>
+<style>
+@page { size: A4; margin: 2.2cm 2.4cm 2.2cm 2.4cm; }
+:root { --ink:#243447; --muted:#617083; --blue:#285f8f; --line:#d8e1ea; --soft:#f3f7fa; --accent:#eaf2f8; }
+* { box-sizing:border-box; }
+body { font-family:"Microsoft YaHei","SimSun",sans-serif; color:var(--ink); font-size:10.5pt; line-height:1.75; margin:0; }
+.cover { min-height:22cm; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; page-break-after:always; }
+.cover .eyebrow { color:var(--blue); font-size:12pt; letter-spacing:2px; margin-bottom:22px; }
+.cover h1 { font-size:26pt; line-height:1.35; margin:0 0 18px; color:#193b59; }
+.cover .subtitle { font-size:15pt; color:var(--muted); margin-bottom:70px; }
+.cover .meta { color:var(--muted); font-size:10.5pt; }
+.doc-header { border-bottom:1px solid var(--line); color:var(--muted); font-size:9pt; padding-bottom:7px; margin-bottom:24px; }
+.doc-footer { border-top:1px solid var(--line); color:var(--muted); font-size:9pt; padding-top:7px; margin-top:24px; text-align:center; }
+h1 { color:#193b59; font-size:20pt; margin:26px 0 13px; padding-bottom:6px; border-bottom:2px solid var(--blue); page-break-before:always; }
+h1:first-of-type { page-break-before:auto; }
+h2 { color:var(--blue); font-size:15pt; margin:22px 0 8px; }
+h3 { color:#3d617f; font-size:12pt; margin:16px 0 5px; }
+p { margin:7px 0; }
+blockquote { margin:14px 0; padding:10px 16px; background:var(--accent); border-left:4px solid var(--blue); color:#35516b; }
+ul, ol { margin:6px 0 10px 24px; padding-left:18px; }
+li { margin:3px 0; }
+strong { color:#183d5d; }
+table { width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:9.5pt; page-break-inside:avoid; }
+th { background:#eaf2f8; color:#244a69; font-weight:bold; }
+th, td { border:1px solid var(--line); padding:7px 8px; vertical-align:top; }
+tr:nth-child(even) td { background:#fbfcfd; }
+code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding:1px 4px; color:#814c22; }
+.note { background:#fff9e8; border-left:4px solid #d6a72c; padding:9px 13px; margin:12px 0; }
+</style>
+</head>
+<body>
+<section class="cover" role="cover">
+  <div class="eyebrow">Vibe-Coding 实验3 · 交付物①</div>
+  <h1>myMemory<br>后端模块划分清单</h1>
+  <div class="subtitle">口述记录生成传记系统 · 网页微缩版</div>
+  <div class="meta">依据：《PRD（人工修改版）》《技术方案与页面原型规划（人工修改稿）》｜阶段：详细设计（模块拆分）</div>
+</section>
+<section role="body">
+<header class="doc-header">myMemory 口述记录生成传记系统（网页微缩版）｜后端模块划分清单</header>
+
+<h1>1. 说明</h1>
+<h2>1.1 文档目的</h2>
+<p>本文档基于《myMemory 口述记录生成传记系统 PRD（人工修改版）》与《myMemory 技术方案与页面原型规划（人工修改稿）》，对系统后端进行<strong>模块拆分</strong>，输出模块清单、各模块职责描述与模块间的职责边界，作为接口设计、编码实现与联调验收的直接依据。</p>
+<p>本文档对应 V 模型中<strong>详细设计</strong>环节的模块拆分部分，与《标准化 API 接口文档》《UI 设计规范 v2.0》共同构成本实验的完整交付。</p>
+<h2>1.2 拆分原则</h2>
+<ol>
+<li><strong>职责单一：</strong>每个模块只承担一类工作，模块内部高内聚。</li>
+<li><strong>互不重叠：</strong>任一职责只归属一个模块，不存在两个模块都能处理同一种输入的情况。</li>
+<li><strong>依赖单向：</strong>模块间依赖方向明确且无环，底层模块不反向依赖上层模块。</li>
+<li><strong>最小必要：</strong>只保留本项目定位所需的模块，不为"以后可能要"预留模块。</li>
+<li><strong>对齐前序：</strong>不新增 PRD 与技术方案中不存在的功能或需求。</li>
+</ol>
+<h2>1.3 与其他文档的关系</h2>
+<table><thead><tr><th>文档</th><th>关系</th></tr></thead><tbody>
+<tr><td>PRD（人工修改版）</td><td>业务来源，本清单的模块职责不得超出其功能范围</td></tr>
+<tr><td>技术方案与页面原型规划（人工修改稿）</td><td>架构与选型依据。其第 4 章给出功能模块、第 8 章给出接口与数据结构</td></tr>
+<tr><td>业务边界清单（人工修改版）</td><td>范围基线，其中「明确不做」的内容不得出现在本清单中</td></tr>
+<tr><td>本清单（后端模块划分）</td><td>下游《标准化 API 接口文档》的模块依据</td></tr>
+</tbody></table>
+<h2>1.4 拆分范围与前提</h2>
+<p>本项目为<strong>轻量化网页微缩版</strong>，架构上采用「浏览器本地优先 + 单后端代理」：记录、音频、文本等全部用户数据保存在浏览器 IndexedDB 中，后端<strong>不持久化用户数据</strong>，只承担两类工作 —— <strong>代理外部智能服务</strong>（语音识别、AI 润色）与<strong>生成导出文档</strong>。</p>
+<p>因此本次拆分有两个前提，直接决定了模块数量：</p>
+<ul>
+<li>凡属于本地能力的职责（记录的增删改查、音频存储、文本编辑、配额检测）<strong>一律不进入后端</strong>，避免与前端职责重叠。</li>
+<li>不引入本项目定位不需要的模块（用户与权限、支付、审核、运营后台、消息通知等），这些内容在《业务边界清单》中已列为「明确不做」。</li>
+</ul>
+<div class="note"><strong>拆分范围：</strong>本文档只拆分<strong>后端模块</strong>。前端页面与前端模块划分见《技术方案与页面原型规划（人工修改稿）》第 9 章与《UI 设计规范 v2.0》第 7 章。</div>
+
+<h1>2. 后端模块总览</h1>
+<h2>2.1 模块清单</h2>
+<table><thead><tr><th>编号</th><th>模块名称</th><th>一句话职责</th><th>承载接口</th><th>依赖模块</th></tr></thead><tbody>
+<tr><td>B01</td><td>素材接入模块<br>AssetIngest</td><td>接收前端上传的音频素材并完成准入校验，输出可转写的音频载荷</td><td>POST /api/transcriptions</td><td>无</td></tr>
+<tr><td>B02</td><td>语音转写模块<br>Transcription</td><td>调用外部语音识别能力，把音频载荷转换为原始转写文本</td><td>POST /api/transcriptions</td><td>B05</td></tr>
+<tr><td>B03</td><td>AI 生成模块<br>Generation</td><td>把原始转写文本生成传记初稿，约束不得虚构事实</td><td>POST /api/polish</td><td>B05</td></tr>
+<tr><td>B04</td><td>文档导出模块<br>Export</td><td>组装 OOXML，生成 DOCX 文档字节流</td><td>POST /api/exports</td><td>无</td></tr>
+<tr><td>B05</td><td>外部服务网关模块<br>UpstreamGateway</td><td>统一封装外部服务的端点、密钥、超时与重试策略</td><td>对内提供，无独立对外接口</td><td>无</td></tr>
+<tr><td>B06</td><td>服务状态模块<br>Health</td><td>汇报服务与外部依赖可用性，供前端判断是否进入本地模式</td><td>GET /api/health</td><td>B05</td></tr>
+</tbody></table>
+<h2>2.2 模块依赖关系</h2>
+<table><thead><tr><th>依赖方向</th><th>依赖内容</th><th>说明</th></tr></thead><tbody>
+<tr><td>B02 → B05</td><td>转写模块经网关调用语音识别服务</td><td>密钥与端点只出现在 B05，B02 不感知</td></tr>
+<tr><td>B03 → B05</td><td>生成模块经网关调用大模型服务</td><td>同上</td></tr>
+<tr><td>B06 → B05</td><td>状态模块向网关探活，判断外部能力是否可用</td><td>只探测可用性，不发起业务调用</td></tr>
+<tr><td>B04 → 无</td><td>导出模块不依赖任何模块</td><td>纯计算型模块，可完全离线运行、独立测试</td></tr>
+</tbody></table>
+<p>依赖方向<strong>全部单向且无环</strong>：B04 独立；B01 只做校验并驱动 B02；B05 位于最底层，不反向调用任何业务模块。</p>
+
+<h1>3. 各模块职责说明</h1>
+<h2>3.1 B01 素材接入模块（AssetIngest）</h2>
+<table><thead><tr><th>项</th><th>内容</th></tr></thead><tbody>
+<tr><td>职责</td><td>接收前端提交的音频二进制与元信息；执行准入校验（是否为空、格式是否在白名单内、大小与时长是否超限）；把校验通过的音频载荷交给转写模块</td></tr>
+<tr><td>输入</td><td>音频二进制（webm / mp3 / wav / m4a）、audioFormat、durationSeconds、segmentId</td></tr>
+<tr><td>输出</td><td>校验通过的音频载荷对象（内存持有，不落盘）</td></tr>
+<tr><td>明确不做</td><td>不做转写；不做音频转码与剪辑；不持久化音频；不生成任何文本</td></tr>
+<tr><td>承载接口</td><td>POST /api/transcriptions（校验阶段）</td></tr>
+</tbody></table>
+<h2>3.2 B02 语音转写模块（Transcription）</h2>
+<table><thead><tr><th>项</th><th>内容</th></tr></thead><tbody>
+<tr><td>职责</td><td>调用外部语音识别能力，把音频载荷转换为中文原始转写文本；控制超时与重试上限；识别「结果为空」并将其作为业务异常返回</td></tr>
+<tr><td>输入</td><td>B01 输出的音频载荷</td></tr>
+<tr><td>输出</td><td>原始转写文本、音频时长、识别引擎标识</td></tr>
+<tr><td>明确不做</td><td>不改写、不润色、不纠错文本；不做说话人分离；不保存音频；不保存文本；不生成传记初稿</td></tr>
+<tr><td>承载接口</td><td>POST /api/transcriptions（转写阶段）</td></tr>
+<tr><td>依赖</td><td>B05 外部服务网关模块</td></tr>
+</tbody></table>
+<h2>3.3 B03 AI 生成模块（Generation）</h2>
+<table><thead><tr><th>项</th><th>内容</th></tr></thead><tbody>
+<tr><td>职责</td><td>接收原始转写文本，调用大模型生成传记初稿；注入「不得虚构人物、时间、地点、事件」的事实约束提示词；执行输出长度与空结果校验</td></tr>
+<tr><td>输入</td><td>sourceText（原始转写文本，只读）、storyTitle、mode（polish 单段润色 / merge 多段合并）</td></tr>
+<tr><td>输出</td><td>润色正文、字数、模型标识、生成时间</td></tr>
+<tr><td>明确不做</td><td>不接触音频；不覆盖或回写原始转写文本；不落盘；不做导出；不做多段排序与合并以外的内容管理</td></tr>
+<tr><td>承载接口</td><td>POST /api/polish</td></tr>
+<tr><td>依赖</td><td>B05 外部服务网关模块</td></tr>
+</tbody></table>
+<h2>3.4 B04 文档导出模块（Export）</h2>
+<table><thead><tr><th>项</th><th>内容</th></tr></thead><tbody>
+<tr><td>职责</td><td>接收标题与正文，组装 OOXML 生成 DOCX 字节流并作为附件返回；负责文件名与字符编码处理</td></tr>
+<tr><td>输入</td><td>title、content、（可选）segments 摘要、exportedAt</td></tr>
+<tr><td>输出</td><td>DOCX 二进制流（Content-Disposition: attachment）</td></tr>
+<tr><td>明确不做</td><td>不做标题与正文的业务校验（校验由前端完成，本模块只保留最后一道防御）；不存储用户内容；不保留服务端副本；不依赖 Office / LibreOffice 组件</td></tr>
+<tr><td>承载接口</td><td>POST /api/exports</td></tr>
+<tr><td>依赖</td><td>无</td></tr>
+</tbody></table>
+<h2>3.5 B05 外部服务网关模块（UpstreamGateway）</h2>
+<table><thead><tr><th>项</th><th>内容</th></tr></thead><tbody>
+<tr><td>职责</td><td>统一封装所有外部服务调用（语音识别、大模型）的端点、密钥、超时、重试与限流策略；对上层提供与业务无关的纯技术通道</td></tr>
+<tr><td>输入</td><td>调用意图（服务类型、载荷）、超时策略</td></tr>
+<tr><td>输出</td><td>外部服务返回的原始响应</td></tr>
+<tr><td>明确不做</td><td>不包含任何业务语义（不认识「片段」「传记」「初稿」）；不向用户输出错误文案；不向前端暴露密钥</td></tr>
+<tr><td>承载接口</td><td>无独立对外接口（对内被 B02 / B03 / B06 调用）</td></tr>
+<tr><td>依赖</td><td>无</td></tr>
+</tbody></table>
+<h2>3.6 B06 服务状态模块（Health）</h2>
+<table><thead><tr><th>项</th><th>内容</th></tr></thead><tbody>
+<tr><td>职责</td><td>汇报后端自身与各外部依赖的可用性，供前端判断是否进入「本地模式」</td></tr>
+<tr><td>输入</td><td>无</td></tr>
+<tr><td>输出</td><td>status、version、capabilities（transcription / generation）、timestamp</td></tr>
+<tr><td>明确不做</td><td>不返回任何用户数据；不做鉴权（本项目为本地单机运行，无账号体系）</td></tr>
+<tr><td>承载接口</td><td>GET /api/health</td></tr>
+<tr><td>依赖</td><td>B05 外部服务网关模块</td></tr>
+</tbody></table>
+
+<h1>4. 关键职责边界</h1>
+<h2>4.1 素材接入 / AI 生成 / 文档导出 三者边界</h2>
+<p>这三个模块是本项目最容易出现职责重叠的位置，因此逐维度列出边界：</p>
+<table><thead><tr><th>维度</th><th>B01 素材接入</th><th>B03 AI 生成</th><th>B04 文档导出</th></tr></thead><tbody>
+<tr><td>处理对象</td><td>音频二进制</td><td>纯文本</td><td>标题 + 正文文本</td></tr>
+<tr><td>是否接触音频</td><td><strong>是（全系统唯一接触者）</strong></td><td>否</td><td>否</td></tr>
+<tr><td>是否调用外部服务</td><td>否</td><td>是（经 B05）</td><td>否</td></tr>
+<tr><td>是否产生新内容</td><td>否，只做准入校验</td><td><strong>是（全系统唯一生成者）</strong></td><td>否，只做排版组装</td></tr>
+<tr><td>是否落盘</td><td>否</td><td>否</td><td>否</td></tr>
+<tr><td>失败时用户可感知的结果</td><td>提示素材不合规，原录音仍保留在本地</td><td>原始转写文本完整保留，可重试</td><td>导出不成功，编辑内容不受影响</td></tr>
+</tbody></table>
+<blockquote>三者的边界可概括为一句话：<strong>B01 决定素材能不能用，B03 决定文字怎么写，B04 决定内容怎么交付。</strong></blockquote>
+<p>三者之间不共享任何状态，只通过明确定义的载荷单向传递，因此任一模块失效都不会破坏其他模块已持有的数据。</p>
+<h2>4.2 易混淆点辨析</h2>
+<table><thead><tr><th>更容易出现的一种划分</th><th>为什么不采用</th><th>本稿的处理</th></tr></thead><tbody>
+<tr><td>把转写并入「素材模块」</td><td>素材模块只做准入校验，不依赖网络；转写必须调用外部服务，两者的失败原因、超时策略与重试方式完全不同</td><td>拆为 B01 与 B02</td></tr>
+<tr><td>把大模型调用单独抽成「模型客户端」并与生成模块并列</td><td>若单独抽出，它也要理解「润色」「合并」等业务语义，会与 B03 产生职责重叠</td><td>以「是否理解业务」为界：B03 保留业务语义，B05 只做纯技术通道</td></tr>
+<tr><td>把 DOCX 生成并入「AI 生成模块」</td><td>导出不调用 AI，且在无网络时仍应可用，失败面与 AI 模块完全不同</td><td>独立为 B04，且不依赖任何模块</td></tr>
+<tr><td>把健康检查并入网关模块</td><td>网关模块要求对上层严格隐藏密钥细节，而健康检查需要对外暴露可用性信息，两者的可见性要求相反</td><td>拆为 B05 与 B06</td></tr>
+<tr><td>在后端增加「记录管理模块」</td><td>本项目数据本地优先，记录由浏览器 IndexedDB 管理，后端一旦介入存储即与前端职责重叠，并违背隐私设计</td><td>不设该模块，记录管理完全由前端承担</td></tr>
+</tbody></table>
+
+<h1>5. 与前序文档的对照</h1>
+<h2>5.1 业务动作的承载层</h2>
+<p>本表用于说明实验指定的业务动作在本项目架构中分别由哪一层承载，以及为什么其中一项不产生后端接口。</p>
+<table><thead><tr><th>业务动作</th><th>承载层</th><th>涉及模块</th><th>说明</th></tr></thead><tbody>
+<tr><td>新建传记项目</td><td>前端本地</td><td>无</td><td>本项目数据本地优先，新建记录是浏览器的本地写入，后端不持久化用户数据，故不产生接口</td></tr>
+<tr><td>上传 / 录入口述素材</td><td>前端采集 + 后端接入</td><td>B01 → B02 → B05</td><td>前端负责录音与本地存储；后端只负责素材校验与转写，不保存音频</td></tr>
+<tr><td>AI 生成传记初稿</td><td>后端代理</td><td>B03 → B05</td><td>由后端代理调用，前端不接触任何密钥</td></tr>
+<tr><td>导出文档</td><td>后端生成</td><td>B04</td><td>由后端组装 OOXML 生成 DOCX，见技术方案 8.3 决策三</td></tr>
+</tbody></table>
+<div class="note"><strong>说明：</strong>「新建传记项目」不产生后端接口，是本项目「数据本地优先、后端不持久化用户数据」这一既定设计决策的直接结果，并非接口设计遗漏。相反，若为它强行增设后端写入接口，将与技术方案 8.3 决策一相冲突。</div>
+<h2>5.2 与实验2 功能模块的映射</h2>
+<table><thead><tr><th>实验2 功能模块</th><th>承载层</th><th>实验3 后端模块</th></tr></thead><tbody>
+<tr><td>M01 记录管理</td><td>前端本地</td><td>—</td></tr>
+<tr><td>M02 录音录入</td><td>前端本地</td><td>—</td></tr>
+<tr><td>M03 本地存储</td><td>前端本地</td><td>—</td></tr>
+<tr><td>M04 多段口述管理</td><td>前端本地</td><td>—</td></tr>
+<tr><td>M05 文本编辑与保存</td><td>前端本地</td><td>—</td></tr>
+<tr><td>M06 文档导出</td><td>后端</td><td>B04</td></tr>
+<tr><td>M07 语音转文字</td><td>后端代理</td><td>B01 + B02</td></tr>
+<tr><td>M08 AI 润色与合并</td><td>后端代理</td><td>B03</td></tr>
+<tr><td>M09 状态与异常反馈</td><td>前后端共同</td><td>B06（服务可用性）＋ 前端</td></tr>
+<tr><td>M10 隐私与数据管理</td><td>前端本地</td><td>—</td></tr>
+<tr><td>M11 设置与关于</td><td>前端本地</td><td>—（后续迭代）</td></tr>
+<tr><td>M12 音频文件上传</td><td>前端采集 + 后端接入</td><td>B01</td></tr>
+</tbody></table>
+<p>12 个功能模块中只有 5 个落在后端，其余由前端本地承担。这是「数据本地优先」架构的必然结果，也保证了本清单<strong>没有新增 PRD 与技术方案中不存在的需求</strong>。</p>
+
+<h1>6. 模块拆分自查</h1>
+<table><thead><tr><th>检查项</th><th>结论</th><th>依据</th></tr></thead><tbody>
+<tr><td>每个模块职责单一</td><td>符合</td><td>6 个模块各只承担一类工作，见第 3 章</td></tr>
+<tr><td>模块之间无功能重叠</td><td>符合</td><td>以「是否接触音频 / 是否理解业务 / 是否落盘」三条判据划分，见 4.1、4.2</td></tr>
+<tr><td>无冗余模块</td><td>符合</td><td>未引入用户权限、支付、审核、运营后台等本项目不做的模块</td></tr>
+<tr><td>依赖方向无环</td><td>符合</td><td>B04 独立；B01 驱动 B02；B02 / B03 / B06 单向依赖 B05，见 2.2</td></tr>
+<tr><td>与前序文档一致</td><td>符合</td><td>见 5.2 映射表，无新增需求</td></tr>
+<tr><td>符合高内聚低耦合</td><td>符合</td><td>同模块内职责相关，模块间仅通过定义好的载荷传递，不共享状态</td></tr>
+</tbody></table>
+
+<footer class="doc-footer">myMemory 后端模块划分清单｜Vibe-Coding 实验3 交付物①｜依据《PRD（人工修改版）》与《技术方案与页面原型规划（人工修改稿）》编制</footer>
+</section>
+</body>
+</html>
