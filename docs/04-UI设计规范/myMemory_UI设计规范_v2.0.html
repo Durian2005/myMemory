@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>myMemory UI 设计规范 v2.0</title>
+<style>
+@page { size: A4; margin: 2.2cm 2.4cm 2.2cm 2.4cm; }
+:root { --ink:#243447; --muted:#617083; --blue:#285f8f; --line:#d8e1ea; --soft:#f3f7fa; --accent:#eaf2f8; }
+* { box-sizing:border-box; }
+body { font-family:"Microsoft YaHei","SimSun",sans-serif; color:var(--ink); font-size:10.5pt; line-height:1.75; margin:0; }
+.cover { min-height:22cm; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; page-break-after:always; }
+.cover .eyebrow { color:var(--blue); font-size:12pt; letter-spacing:2px; margin-bottom:22px; }
+.cover h1 { font-size:26pt; line-height:1.35; margin:0 0 18px; color:#193b59; }
+.cover .subtitle { font-size:15pt; color:var(--muted); margin-bottom:70px; }
+.cover .meta { color:var(--muted); font-size:10.5pt; }
+.doc-header { border-bottom:1px solid var(--line); color:var(--muted); font-size:9pt; padding-bottom:7px; margin-bottom:24px; }
+.doc-footer { border-top:1px solid var(--line); color:var(--muted); font-size:9pt; padding-top:7px; margin-top:24px; text-align:center; }
+h1 { color:#193b59; font-size:20pt; margin:26px 0 13px; padding-bottom:6px; border-bottom:2px solid var(--blue); page-break-before:always; }
+h1:first-of-type { page-break-before:auto; }
+h2 { color:var(--blue); font-size:15pt; margin:22px 0 8px; }
+h3 { color:#3d617f; font-size:12pt; margin:16px 0 5px; }
+p { margin:7px 0; }
+blockquote { margin:14px 0; padding:10px 16px; background:var(--accent); border-left:4px solid var(--blue); color:#35516b; }
+ul, ol { margin:6px 0 10px 24px; padding-left:18px; }
+li { margin:3px 0; }
+strong { color:#183d5d; }
+table { width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:9.5pt; page-break-inside:avoid; }
+th { background:#eaf2f8; color:#244a69; font-weight:bold; }
+th, td { border:1px solid var(--line); padding:7px 8px; vertical-align:top; }
+tr:nth-child(even) td { background:#fbfcfd; }
+code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding:1px 4px; color:#814c22; }
+.note { background:#fff9e8; border-left:4px solid #d6a72c; padding:9px 13px; margin:12px 0; }
+.sw { display:inline-block; width:13px; height:13px; border-radius:3px; border:1px solid rgba(0,0,0,.12); vertical-align:-2px; margin-right:5px; }
+</style>
+</head>
+<body>
+<section class="cover" role="cover">
+  <div class="eyebrow">Vibe-Coding 实验3 · 交付物③</div>
+  <h1>myMemory<br>UI 设计规范</h1>
+  <div class="subtitle">口述记录生成传记系统 · 网页微缩版 · v2.0</div>
+  <div class="meta">四件套齐全：统一配色方案 / 统一组件样式 / 统一排版与栅格 / 统一交互动作</div>
+  <div class="meta" style="margin-top:6px">附录 A 附 6 个页面的高保真视觉示意</div>
+</section>
+<section role="body">
+<header class="doc-header">myMemory 口述记录生成传记系统（网页微缩版）｜UI 设计规范 v2.0</header>
+
+<h1>1. 说明</h1>
+<h2>1.1 本规范的作用</h2>
+<p>本文档是 myMemory 前端开发的<strong>唯一视觉与交互基准</strong>。所有页面、组件与交互动作都必须严格对齐本规范；实现过程中若发现规范未覆盖的情况，应先补充规范再实现，不得各自即兴决定。</p>
+<p>本规范在 v1.0 的基础上做了两处实质性补充：<strong>排版栅格</strong>由原先只有字号与间距，扩展为完整的列栅格与断点体系；<strong>交互动作</strong>由原先零散的约束，扩展为按钮、表单、弹窗、错误提示四类交互的完整定义。同时修正了 v1.0 中主按钮对比度标注有误的问题（见 2.6）。</p>
+<h2>1.2 设计原则</h2>
+<ol>
+<li><strong>语音优先：</strong>录音是核心动作，在任何相关页面都应是视觉权重最高的元素。</li>
+<li><strong>一页一主操作：</strong>每页只允许一个主按钮，其余操作以次级或文字按钮呈现。</li>
+<li><strong>状态可见：</strong>任何耗时或状态变化都必须有文字说明，不允许只用颜色或动画表达。</li>
+<li><strong>大而清晰：</strong>面向中老年用户，字号、间距与点击区均取下限偏大的取值。</li>
+<li><strong>克制装饰：</strong>不使用插画、渐变背景与装饰性动画，避免干扰主流程。</li>
+<li><strong>暖色统一：</strong>背景、卡片、按钮、文字、边框全部取自同一低饱和暖色体系。</li>
+</ol>
+<h2>1.3 四件套总览</h2>
+<p>本规范按 UI 设计规范的四件套组织，四部分互相独立又彼此约束：</p>
+<table><thead><tr><th>件套</th><th>章节</th><th>解决什么问题</th></tr></thead><tbody>
+<tr><td>统一配色方案</td><td>第 2 章</td><td>颜色不再靠即兴挑选，任何颜色都有唯一来源与十六进制取值</td></tr>
+<tr><td>统一组件样式</td><td>第 3 章</td><td>同一个组件在任何页面长得一样，尺寸与层级固定</td></tr>
+<tr><td>统一排版与栅格</td><td>第 4 章</td><td>字号、间距、栏宽与页面骨架统一，多页面观感一致</td></tr>
+<tr><td>统一交互动作</td><td>第 5 章</td><td>悬停、聚焦、提交、报错、弹窗的行为与反馈统一</td></tr>
+</tbody></table>
+<h2>1.4 与其他文档的关系</h2>
+<table><thead><tr><th>文档</th><th>关系</th></tr></thead><tbody>
+<tr><td>技术方案与页面原型规划（人工修改稿）</td><td>上游依据，本规范的尺寸与交互约束均源于其 8.2、8.3、9.1–9.8 节</td></tr>
+<tr><td>后端模块划分清单 / 标准化 API 接口文档</td><td>同批交付物。接口返回的错误码文案直接进入本规范 5.6 的错误提示体系</td></tr>
+<tr><td>业务边界清单（人工修改版）</td><td>范围基线，本规范不得为「明确不做」的功能设计界面</td></tr>
+<tr><td>本规范（UI 设计规范 v2.0）</td><td>前端编码、联调与验收的唯一执行依据</td></tr>
+</tbody></table>
+
+<h1>2. 统一配色方案</h1>
+<h2>2.1 配色总则与禁令</h2>
+<p>全站配色统一采用<strong>低饱和度暖色系</strong>，由米白、奶油、浅驼、暖木、淡陶土等色构成，营造温馨柔和的视觉氛围。背景、卡片、按钮、文字、边框全部取自同一暖色体系，保持整体协调。</p>
+<p><strong>配色禁令：</strong>禁止使用大红、大紫等高饱和鲜艳色；禁止夸张渐变、霓虹色与强对比撞色。所有语义色同样以低饱和暖色表达，不引入冷色。</p>
+<div class="note"><strong>关于「高对比」与「低饱和」的关系：</strong>面向中老年用户要求的是<strong>对比度</strong>高，即前景与背景的<strong>明度差</strong>足够大；而本规范的约束是<strong>饱和度</strong>低，即颜色不刺眼。二者并不冲突 —— 本规范通过「深色文字 + 浅色背景」实现高对比，同时所有色相都保持在低饱和的暖色区间内。全部取值均经 WCAG 对比度公式实测，见 2.6。</div>
+<h2>2.2 主色系</h2>
+<table><thead><tr><th>Token</th><th>色值</th><th>色相描述</th><th>用途</th></tr></thead><tbody>
+<tr><td><span class="sw" style="background:#96604B"></span><code>--color-primary</code></td><td><code>#96604B</code></td><td>暖木色</td><td>主按钮底色、进度条填充、选中态指示</td></tr>
+<tr><td><span class="sw" style="background:#8A5A45"></span><code>--color-primary-hover</code></td><td><code>#8A5A45</code></td><td>暖木色加深</td><td>主按钮悬停</td></tr>
+<tr><td><span class="sw" style="background:#7A4B3B"></span><code>--color-primary-active</code></td><td><code>#7A4B3B</code></td><td>暖木色更深</td><td>主按钮按下</td></tr>
+<tr><td><span class="sw" style="background:#E8D5C6"></span><code>--color-primary-soft</code></td><td><code>#E8D5C6</code></td><td>淡陶土色</td><td>选中背景、浅色强调块、录制中呼吸圈</td></tr>
+<tr><td><span class="sw" style="background:#B4785A"></span><code>--color-accent</code></td><td><code>#B4785A</code></td><td>暖木色（浅）</td><td><strong>仅用于非文字元素</strong>：录音呼吸圈、装饰性描边、进度条轨道。严禁作为文字底色</td></tr>
+</tbody></table>
+<h2>2.3 中性色（暖调）</h2>
+<table><thead><tr><th>Token</th><th>色值</th><th>用途</th></tr></thead><tbody>
+<tr><td><span class="sw" style="background:#3D332C"></span><code>--color-text</code></td><td><code>#3D332C</code></td><td>正文与标题（暖褐黑）</td></tr>
+<tr><td><span class="sw" style="background:#6E5F54"></span><code>--color-text-muted</code></td><td><code>#6E5F54</code></td><td>辅助说明、次要信息（暖灰褐）</td></tr>
+<tr><td><span class="sw" style="background:#E3D8CC"></span><code>--color-border</code></td><td><code>#E3D8CC</code></td><td>分割线、输入框边框（浅驼）</td></tr>
+<tr><td><span class="sw" style="background:#FDFAF5"></span><code>--color-bg</code></td><td><code>#FDFAF5</code></td><td>卡片与内容区背景（奶油白）</td></tr>
+<tr><td><span class="sw" style="background:#F7F1E8"></span><code>--color-bg-subtle</code></td><td><code>#F7F1E8</code></td><td>页面背景（米白）</td></tr>
+<tr><td><span class="sw" style="background:#EFE4D6"></span><code>--color-bg-hover</code></td><td><code>#EFE4D6</code></td><td>次按钮与列表项悬停底（浅驼）</td></tr>
+</tbody></table>
+<h2>2.4 语义色</h2>
+<p>语义色分两种用法：作为<strong>图形色</strong>（状态圆点、图标描边）使用时取「图形值」；作为<strong>标签</strong>使用时一律采用「浅底 + 深字」组合，不使用「深底 + 白字」，以保证对比度。</p>
+<table><thead><tr><th>语义</th><th>图形色</th><th>标签底色</th><th>标签文字色</th><th>使用场景</th></tr></thead><tbody>
+<tr><td>成功</td><td><span class="sw" style="background:#7D8C4F"></span><code>#7D8C4F</code></td><td><span class="sw" style="background:#E7EBD9"></span><code>#E7EBD9</code></td><td><code>#4F5C2C</code></td><td>保存成功、转写成功、已保存</td></tr>
+<tr><td>警告</td><td><span class="sw" style="background:#B07C22"></span><code>#B07C22</code></td><td><span class="sw" style="background:#F5E9D2"></span><code>#F5E9D2</code></td><td><code>#7A5A1E</code></td><td>存储不足、未保存提醒</td></tr>
+<tr><td>危险</td><td><span class="sw" style="background:#A85A4D"></span><code>#A85A4D</code></td><td><span class="sw" style="background:#F4DDD8"></span><code>#F4DDD8</code></td><td><code>#8F4438</code></td><td>删除、重录、错误提示</td></tr>
+<tr><td>中性</td><td><span class="sw" style="background:#6E5F54"></span><code>#6E5F54</code></td><td><span class="sw" style="background:#EFE4D6"></span><code>#EFE4D6</code></td><td><code>#6E5F54</code></td><td>待转写、仅录音等中间状态</td></tr>
+</tbody></table>
+<p>危险操作按钮的底色使用 <code>#A85A4D</code>（与危险图形色一致），悬停加深为 <code>#9C4F42</code>，按下为 <code>#8F4438</code>。</p>
+<h2>2.5 链接与交互态</h2>
+<table><thead><tr><th>Token</th><th>色值</th><th>用途</th></tr></thead><tbody>
+<tr><td><span class="sw" style="background:#8A5A45"></span><code>--color-link</code></td><td><code>#8A5A45</code></td><td>文字链接（与主色同族加深）</td></tr>
+<tr><td><span class="sw" style="background:#7A4E3C"></span><code>--color-link-hover</code></td><td><code>#7A4E3C</code></td><td>链接悬停</td></tr>
+<tr><td><span class="sw" style="background:#96604B"></span><code>--color-focus</code></td><td><code>#96604B</code></td><td>键盘聚焦轮廓（2px 外发光，偏移 2px）</td></tr>
+</tbody></table>
+<h2>2.6 对比度实测</h2>
+<p>以下数值按 WCAG 2.1 相对亮度公式计算。正文与说明文字要求不低于 <strong>4.5:1</strong>；图形与控件边界要求不低于 <strong>3:1</strong>。</p>
+<table><thead><tr><th>前景</th><th>背景</th><th>实测对比度</th><th>要求</th><th>用途</th><th>结论</th></tr></thead><tbody>
+<tr><td><code>#3D332C</code></td><td><code>#FDFAF5</code></td><td><strong>11.81:1</strong></td><td>≥4.5:1</td><td>正文、标题 / 卡片底</td><td>通过</td></tr>
+<tr><td><code>#3D332C</code></td><td><code>#F7F1E8</code></td><td>10.95:1</td><td>≥4.5:1</td><td>正文 / 页面底</td><td>通过</td></tr>
+<tr><td><code>#3D332C</code></td><td><code>#EFE4D6</code></td><td>9.80:1</td><td>≥4.5:1</td><td>正文 / 悬停底</td><td>通过</td></tr>
+<tr><td><code>#3D332C</code></td><td><code>#E8D5C6</code></td><td>8.64:1</td><td>≥4.5:1</td><td>正文 / 淡陶土强调块</td><td>通过</td></tr>
+<tr><td><code>#6E5F54</code></td><td><code>#FDFAF5</code></td><td>5.88:1</td><td>≥4.5:1</td><td>辅助说明 / 卡片底</td><td>通过</td></tr>
+<tr><td><code>#6E5F54</code></td><td><code>#F7F1E8</code></td><td>5.46:1</td><td>≥4.5:1</td><td>辅助说明 / 页面底</td><td>通过</td></tr>
+<tr><td><code>#6E5F54</code></td><td><code>#EFE4D6</code></td><td>4.88:1</td><td>≥4.5:1</td><td>辅助说明 / 悬停底</td><td>通过</td></tr>
+<tr><td><code>#FDFAF5</code></td><td><code>#96604B</code></td><td><strong>4.95:1</strong></td><td>≥4.5:1</td><td>主按钮文字 / 主按钮底</td><td>通过</td></tr>
+<tr><td><code>#FDFAF5</code></td><td><code>#8A5A45</code></td><td>5.56:1</td><td>≥4.5:1</td><td>主按钮文字 / 悬停底</td><td>通过</td></tr>
+<tr><td><code>#FDFAF5</code></td><td><code>#A85A4D</code></td><td>4.76:1</td><td>≥4.5:1</td><td>危险按钮文字 / 底色</td><td>通过</td></tr>
+<tr><td><code>#8A5A45</code></td><td><code>#FDFAF5</code></td><td>5.56:1</td><td>≥4.5:1</td><td>链接 / 卡片底</td><td>通过</td></tr>
+<tr><td><code>#8A5A45</code></td><td><code>#EFE4D6</code></td><td>4.61:1</td><td>≥4.5:1</td><td>链接 / 悬停底</td><td>通过</td></tr>
+<tr><td><code>#4F5C2C</code></td><td><code>#E7EBD9</code></td><td>5.96:1</td><td>≥4.5:1</td><td>成功标签文字 / 标签底</td><td>通过</td></tr>
+<tr><td><code>#7A5A1E</code></td><td><code>#F5E9D2</code></td><td>5.28:1</td><td>≥4.5:1</td><td>警告标签文字 / 标签底</td><td>通过</td></tr>
+<tr><td><code>#8F4438</code></td><td><code>#F4DDD8</code></td><td>5.30:1</td><td>≥4.5:1</td><td>危险标签文字 / 标签底</td><td>通过</td></tr>
+<tr><td><code>#7D8C4F</code></td><td><code>#FDFAF5</code></td><td>3.52:1</td><td>≥3:1</td><td>成功图形（圆点、图标）</td><td>通过</td></tr>
+<tr><td><code>#B07C22</code></td><td><code>#FDFAF5</code></td><td>3.51:1</td><td>≥3:1</td><td>警告图形（圆点、图标）</td><td>通过</td></tr>
+<tr><td><code>#A85A4D</code></td><td><code>#FDFAF5</code></td><td>4.76:1</td><td>≥3:1</td><td>危险图形（圆点、图标）</td><td>通过</td></tr>
+</tbody></table>
+<div class="note"><strong>v2.0 修正说明：</strong>v1.0 曾标注「主按钮底 <code>#B4785A</code> 配白字约 4.6:1」，经实测该组合仅为 <strong>3.49:1</strong>，未达到正文 4.5:1 的要求。v2.0 将主按钮底色加深为 <code>#96604B</code>（实测 4.95:1），原 <code>#B4785A</code> 降级为 <code>--color-accent</code>，仅用于不承载文字的装饰元素。</div>
+<h2>2.7 色彩使用规则</h2>
+<ul>
+<li>同一屏内主色（<code>--color-primary</code>）的实心面积占比不超过 10%，避免大面积深色块造成压迫感。</li>
+<li>语义色只用于表达状态，不得用于装饰；中性状态一律使用中性色而非语义色。</li>
+<li>禁止「浅底 + 浅字」组合：所有文字的对比度都必须满足 2.6 的要求。</li>
+<li>页面背景统一为 <code>--color-bg-subtle</code>，卡片与内容区统一为 <code>--color-bg</code>，不得混用。</li>
+</ul>
+
+<h1>3. 统一组件样式</h1>
+<h2>3.1 按钮</h2>
+<table><thead><tr><th>类型</th><th>底色 / 文字色</th><th>高度</th><th>圆角</th><th>使用场景</th></tr></thead><tbody>
+<tr><td>主按钮 Primary</td><td><code>#96604B</code> / <code>#FDFAF5</code>，18px 600</td><td><strong>56px</strong></td><td>12px</td><td><strong>每页仅一个</strong>：开始录音、保存内容、导出文档、新建记录</td></tr>
+<tr><td>次按钮 Secondary</td><td><code>#FDFAF5</code> 底 / <code>#8A5A45</code> 字，1px <code>#E3D8CC</code> 边框</td><td>48px</td><td>12px</td><td>暂停、继续、播放、进入编辑、上传音频</td></tr>
+<tr><td>文字按钮 Text</td><td>无底色 / <code>#6E5F54</code> 字</td><td>48px</td><td>—</td><td>删除、取消、返回、查看等低频操作</td></tr>
+<tr><td>危险按钮 Danger</td><td><code>#A85A4D</code> / <code>#FDFAF5</code></td><td>48px</td><td>12px</td><td><strong>仅出现在二次确认弹窗内</strong></td></tr>
+</tbody></table>
+<ul>
+<li>主按钮左右内边距 24px；按钮内文字与图标间距 8px。</li>
+<li>禁用态：不透明度 40%，并在按钮下方或旁边保留一行 16px 文字说明禁用原因。</li>
+<li>加载态：按钮文字替换为「处理中…」，宽度保持不变，禁止重复点击；<strong>不使用转圈动画</strong>。</li>
+</ul>
+<h2>3.2 录音按钮（核心组件）</h2>
+<p>录音是本产品的核心动作，单独定义规格。圆钮直径 <strong>96px</strong>，底色 <code>#96604B</code>，外圈为 12px 的 <code>#E8D5C6</code> 环。</p>
+<table><thead><tr><th>状态</th><th>外观</th><th>文案</th><th>可用的次级操作</th></tr></thead><tbody>
+<tr><td>未开始</td><td>96px 实心圆钮，居中</td><td>开始录音</td><td>上传音频</td></tr>
+<tr><td>录音中</td><td>圆钮变为停止图标，外圈 3 秒呼吸动效；实时显示时长</td><td>正在录音 · 00:42</td><td>暂停、结束本段</td></tr>
+<tr><td>已暂停</td><td>圆钮恢复实心主色</td><td>已暂停</td><td>继续、结束本段、重新录制</td></tr>
+<tr><td>已结束待确认</td><td>圆钮隐藏，改为两个动作按钮</td><td>录音时长 03:15</td><td>重新录制（文字按钮）、确认录音（主按钮）</td></tr>
+<tr><td>失败</td><td>圆钮置灰（<code>#E3D8CC</code>）</td><td>录音失败，请检查麦克风后重试</td><td>重试、上传音频</td></tr>
+</tbody></table>
+<div class="note"><strong>硬约束：</strong>录音过程中必须有<strong>文字</strong>状态提示，不能只靠动效；未点击「确认录音」之前，任何情况下都不得自动进入转写流程。</div>
+<h2>3.3 表单与输入</h2>
+<ul>
+<li>输入框高度 <strong>56px</strong>，左右内边距 16px，边框 1px <code>#E3D8CC</code>，圆角 8px，文字 18px。</li>
+<li>标签置于输入框<strong>上方</strong>，16px / 500，<strong>不使用 placeholder 代替标签</strong>。</li>
+<li>聚焦时边框变 <code>#96604B</code>，并加 2px <code>#96604B</code> 外发光（偏移 2px）。</li>
+<li>编辑区为普通文本域，<strong>不提供任何富文本工具栏</strong>（与技术方案 9.6 一致）。</li>
+<li>有字数限制的输入，右侧实时显示计数，如「2 / 40」。</li>
+<li>校验失败时，输入框下方显示 16px 错误文字，颜色 <code>#A85A4D</code>，不使用边框变色作为唯一提示。</li>
+</ul>
+<h2>3.4 表格与卡片</h2>
+<ul>
+<li><strong>记录卡片：</strong>底色 <code>#FDFAF5</code>、12px 圆角、单档投影、内边距 24px；卡片内自上而下固定为「标题 → 更新时间与录音段数 → 状态标签 → 次级操作行」。</li>
+<li>记录标题 24px / 700；元信息 16px（<strong>不得小于 16px，与 A2 一致</strong>），颜色 <code>#6E5F54</code>。</li>
+<li>卡片右下提供「继续编辑」次按钮，左侧提供「查看」「删除」文字按钮；删除按钮文字用 <code>#A85A4D</code>。</li>
+<li>列表项间距 16px，卡片之间不使用分割线。</li>
+<li><strong>数据表格</strong>（若后续迭代引入）：表头底色 <code>#EFE4D6</code>，行高不低于 56px，单元格内边距 16px，斑马纹使用 <code>#FDFAF5</code> 与 <code>#F7F1E8</code> 交替。</li>
+</ul>
+<h2>3.5 状态标签</h2>
+<p>标签为胶囊形，内边距 4px 12px，字号 16px，采用 2.4 中定义的「浅底 + 深字」组合：已保存（成功）、待转写（中性）、仅录音（中性）、转写失败（危险）、存储不足（警告）。</p>
+<h2>3.6 状态提示</h2>
+<table><thead><tr><th>类型</th><th>样式</th><th>使用场景</th></tr></thead><tbody>
+<tr><td>行内提示</td><td>16px 正文 + 左侧 4px 语义色竖条，底色为对应标签底色</td><td>页面内的持续状态，如「正在录音」</td></tr>
+<tr><td>Toast</td><td>顶部居中，底色 <code>#EFE4D6</code>，2.5 秒自动消失，含文字</td><td>保存成功、记录已删除、记录已创建</td></tr>
+<tr><td>错误块</td><td>暖调警示底色 + 「原因 + 下一步动作」两行 + 重试入口</td><td>转写失败、AI 生成失败、存储不足、导出失败</td></tr>
+<tr><td>确认弹窗</td><td>16px 圆角，标题 + 说明 + 两个按钮，主按钮在右下</td><td>删除记录、放弃未保存内容、重新录制</td></tr>
+</tbody></table>
+<p>所有面向用户的提示文案统一遵循「<strong>原因 + 下一步动作</strong>」句式。</p>
+<h2>3.7 弹窗</h2>
+<ul>
+<li>圆角 16px，内边距 24px，最大宽度 520–632px（跨 8 列）。</li>
+<li>结构固定为：标题（22px / 700）→ 说明文字（16px，<code>#6E5F54</code>）→ 按钮区（右下对齐）。</li>
+<li>按钮区中，危险操作使用危险按钮，确认操作使用主按钮，取消使用文字按钮或次按钮，最右侧为主操作。</li>
+<li>弹窗只使用一档投影 <code>0 1px 2px rgba(61,51,44,.06)</code>，层级靠遮罩与边框表达，不使用多层阴影。</li>
+</ul>
+<h2>3.8 空态</h2>
+<p>统一为「一句话说明 + 一个主操作」：不使用插画，文案如「还没有口述记录，可以先创建一条记录」，下方直接给出「新建口述记录」主按钮。</p>
+<h2>3.9 加载态</h2>
+<p>列表与详情加载统一使用<strong>骨架块</strong>（底色 <code>#EFE4D6</code>，圆角 6px），不使用转圈动画；同时给出文字「正在加载…」。</p>
+
+<h1>4. 统一排版与栅格</h1>
+<h2>4.1 字体族</h2>
+<ul>
+<li>中文优先：<code>-apple-system, "Microsoft YaHei", "PingFang SC", sans-serif</code>。</li>
+<li>数字与时长：与正文同字体，必要时使用 <code>font-variant-numeric: tabular-nums</code> 保持等宽，避免时长跳动。</li>
+<li>不使用衬线字体与手写体，避免增加中老年用户的阅读负担。</li>
+</ul>
+<h2>4.2 字号体系</h2>
+<p>字号下限为 <strong>16px</strong>，页面中不允许出现小于 16px 的文字。</p>
+<table><thead><tr><th>Token</th><th>字号 / 行高</th><th>字重</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>--text-display</code></td><td>32px / 1.4</td><td>700</td><td>页面主标题</td></tr>
+<tr><td><code>--text-title</code></td><td>24px / 1.5</td><td>700</td><td>区块标题、记录标题</td></tr>
+<tr><td><code>--text-subtitle</code></td><td>20px / 1.6</td><td>600</td><td>次级标题、卡片标题</td></tr>
+<tr><td><code>--text-button</code></td><td>18px / 1.5</td><td>600</td><td>主按钮文字</td></tr>
+<tr><td><code>--text-body</code></td><td>18px / 1.8</td><td>400</td><td>正文、编辑区</td></tr>
+<tr><td><code>--text-label</code></td><td>16px / 1.6</td><td>500</td><td>标签、次按钮与文字按钮</td></tr>
+<tr><td><code>--text-caption</code></td><td>16px / 1.6</td><td>400</td><td>辅助说明（不低于 16px）</td></tr>
+</tbody></table>
+<h2>4.3 间距体系</h2>
+<p>所有间距取 <strong>8px 的整数倍</strong>，不允许出现 5px、10px 一类非体系值。</p>
+<table><thead><tr><th>Token</th><th>数值</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>--space-1</code></td><td>8px</td><td>行内元素间隔、图标与文字间距</td></tr>
+<tr><td><code>--space-2</code></td><td>16px</td><td>段落间隔、卡片之间的间距</td></tr>
+<tr><td><code>--space-3</code></td><td>24px</td><td>区块间距、卡片内边距、页面左右内边距</td></tr>
+<tr><td><code>--space-4</code></td><td>32px</td><td>章节间距、内容区上下内边距</td></tr>
+<tr><td><code>--space-5</code></td><td>48px</td><td>大区块分隔、底部动作区留白</td></tr>
+</tbody></table>
+<h2>4.4 栅格系统</h2>
+<p>采用 <strong>12 列栅格</strong>，列间距（gutter）固定 <strong>24px</strong>，内容区最大宽度 <strong>960px</strong>：<strong>单列宽 58px</strong>，12 列合计 960px。</p>
+<table><thead><tr><th>断点</th><th>列数</th><th>内容区宽度</th><th>页面左右内边距</th><th>行为</th></tr></thead><tbody>
+<tr><td>≥ 1024px</td><td>12 列</td><td>960px，居中</td><td>24px</td><td>标准布局，左右留白</td></tr>
+<tr><td>768px – 1023px</td><td>8 列</td><td>自适应</td><td>16px</td><td>栅格降为 8 列，跨列比例等比缩放</td></tr>
+<tr><td>&lt; 768px</td><td>—</td><td>—</td><td>—</td><td><strong>不承诺支持</strong>：页面显示「请使用电脑浏览器打开以获得完整功能」</td></tr>
+</tbody></table>
+<h3>常用跨列约定</h3>
+<table><thead><tr><th>场景</th><th>跨列</th><th>实际宽度（≥1024px）</th></tr></thead><tbody>
+<tr><td>记录卡片列表（单列排布）</td><td>跨 12 列</td><td>960px</td></tr>
+<tr><td>表单与输入区</td><td>跨 8 列</td><td>632px</td></tr>
+<tr><td>左右分栏对照（P4 原文 / 润色）</td><td>各跨 6 列</td><td>各 468px</td></tr>
+<tr><td>确认弹窗</td><td>跨 8 列</td><td>632px</td></tr>
+<tr><td>窄屏（768–1023px）下的左右分栏</td><td>改为上下堆叠</td><td>各占 8 列全宽</td></tr>
+</tbody></table>
+<h2>4.5 页面骨架</h2>
+<table><thead><tr><th>区域</th><th>规格</th><th>说明</th></tr></thead><tbody>
+<tr><td>顶部栏</td><td>高 64px，底色 <code>#FDFAF5</code>，底部 1px <code>#E3D8CC</code> 分割线</td><td>左侧返回入口，中间当前记录标题（18px / 600），右侧服务状态标签</td></tr>
+<tr><td>内容区</td><td>最大宽 960px 居中，左右内边距 24px，上下内边距 32px</td><td>所有页面统一</td></tr>
+<tr><td>底部动作区</td><td>高 80px，底色 <code>#FDFAF5</code>，顶部 1px 分割线，含唯一主按钮</td><td>随内容滚动；页面内容不足一屏时吸附在底部</td></tr>
+</tbody></table>
+<p><strong>主按钮位置约定：</strong>主线流程页面（P1–P5）的主按钮固定在底部动作区，保证始终可见；弹窗类页面（P6 导出确认）的主按钮位于弹窗底部右侧；任何情况下主按钮都不得出现在页面中部的内容流中。</p>
+<h2>4.6 圆角与投影</h2>
+<table><thead><tr><th>Token</th><th>数值</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>--radius-sm</code></td><td>8px</td><td>输入框、文本域、小色块</td></tr>
+<tr><td><code>--radius-md</code></td><td>12px</td><td>按钮、卡片、提示块</td></tr>
+<tr><td><code>--radius-lg</code></td><td>16px</td><td>弹窗、设备框</td></tr>
+<tr><td><code>--shadow-card</code></td><td>0 1px 2px rgba(61,51,44,.06)</td><td>卡片与弹窗投影</td></tr>
+</tbody></table>
+<div class="note">全站<strong>只使用一档投影</strong>，不通过多层阴影制造层次；层级差异靠间距、边框与底色表达。</div>
+
+<h1>5. 统一交互动作</h1>
+<h2>5.1 交互总则</h2>
+<ol>
+<li>任何交互都必须有<strong>可感知的反馈</strong>；反馈以文字为主、视觉为辅。</li>
+<li>不使用弹跳、旋转、闪烁等夸张动效；全站仅保留 1 处循环动效（录音呼吸圈）。</li>
+<li>单次状态切换的动画时长不超过 <strong>200ms</strong>。</li>
+<li>尊重系统的「减少动态效果」设置：开启后动画时长归零，功能与状态提示不受影响。</li>
+</ol>
+<h2>5.2 按钮交互</h2>
+<table><thead><tr><th>状态</th><th>主按钮</th><th>次按钮</th><th>文字按钮</th><th>危险按钮</th></tr></thead><tbody>
+<tr><td>默认</td><td>底 <code>#96604B</code>，字 <code>#FDFAF5</code></td><td>底 <code>#FDFAF5</code>，字 <code>#8A5A45</code>，边框 1px <code>#E3D8CC</code></td><td>无底，字 <code>#6E5F54</code></td><td>底 <code>#A85A4D</code>，字 <code>#FDFAF5</code></td></tr>
+<tr><td>悬停</td><td>底 <code>#8A5A45</code></td><td>底 <code>#EFE4D6</code></td><td>字 <code>#8A5A45</code>，加下划线</td><td>底 <code>#9C4F42</code></td></tr>
+<tr><td>按下</td><td>底 <code>#7A4B3B</code></td><td>底 <code>#E3D8CC</code></td><td>字 <code>#7A4B3B</code></td><td>底 <code>#8F4438</code></td></tr>
+<tr><td>聚焦</td><td colspan="4">2px <code>#96604B</code> 外发光，偏移 2px；键盘与鼠标聚焦表现一致</td></tr>
+<tr><td>禁用</td><td colspan="4">不透明度 40%，光标为默认箭头，并保留一行说明文字解释禁用原因</td></tr>
+<tr><td>加载中</td><td colspan="4">按钮文字替换为「处理中…」，宽度不变，禁止重复点击，<strong>不显示转圈</strong></td></tr>
+</tbody></table>
+<h2>5.3 表单交互</h2>
+<table><thead><tr><th>环节</th><th>交互表现</th><th>反馈文案</th></tr></thead><tbody>
+<tr><td>获得焦点</td><td>边框变 <code>#96604B</code> + 2px 外发光</td><td>无额外文案</td></tr>
+<tr><td>失焦且内容有效</td><td>边框恢复 <code>#E3D8CC</code></td><td>无</td></tr>
+<tr><td>失焦且内容无效</td><td>边框变 <code>#A85A4D</code>，下方显示 16px 错误文字</td><td>「请先填写记录标题」</td></tr>
+<tr><td>输入过程中</td><td>错误文字随输入<strong>实时重算</strong>，校验通过即消失</td><td>—</td></tr>
+<tr><td>输入超限</td><td>实时显示计数；达到上限后阻止继续输入</td><td>「2 / 40」</td></tr>
+<tr><td>提交中</td><td>主按钮进入加载态，全部输入项置为只读</td><td>「处理中…」</td></tr>
+<tr><td>提交成功</td><td>顶部 Toast，2.5 秒后自动消失</td><td>「记录已创建，接下来可以开始录音」</td></tr>
+<tr><td>提交失败</td><td>错误块，<strong>保留用户已填写的内容</strong></td><td>「记录创建失败：本地存储空间不足，请清理部分旧记录后重试」</td></tr>
+</tbody></table>
+<h2>5.4 列表与卡片交互</h2>
+<table><thead><tr><th>交互</th><th>表现</th></tr></thead><tbody>
+<tr><td>悬停记录卡片</td><td>底色由 <code>#FDFAF5</code> 变为 <code>#EFE4D6</code>，过渡 150ms</td></tr>
+<tr><td>点击卡片主体</td><td>进入该记录的编辑页，与点击「继续编辑」等价</td></tr>
+<tr><td>悬停次级按钮</td><td>按 5.2 的按钮交互执行，不额外放大</td></tr>
+<tr><td>点击删除</td><td>弹出二次确认弹窗，弹窗关闭后焦点回到删除按钮</td></tr>
+<tr><td>列表为空</td><td>按 3.8 空态规范呈现，主操作直接可点</td></tr>
+</tbody></table>
+<h2>5.5 弹窗交互与动画</h2>
+<table><thead><tr><th>环节</th><th>表现</th></tr></thead><tbody>
+<tr><td>打开</td><td>遮罩 <code>rgba(61,51,44,.34)</code> 淡入 120ms；弹窗透明度 0→1 且上移 8px→0，共 150ms</td></tr>
+<tr><td>关闭</td><td>反向播放，120ms</td></tr>
+<tr><td>动画曲线</td><td><code>cubic-bezier(.2,.8,.2,1)</code>，<strong>不使用回弹效果</strong></td></tr>
+<tr><td>焦点管理</td><td>打开后焦点移入弹窗内第一个可聚焦元素；关闭后焦点返回触发元素</td></tr>
+<tr><td>遮罩点击</td><td>提示类弹窗可点击遮罩关闭；<strong>确认类弹窗（删除、重录、放弃未保存）必须显式选择</strong>，点击遮罩不关闭</td></tr>
+<tr><td>Esc 键</td><td>与点击「取消」等价</td></tr>
+</tbody></table>
+<h2>5.6 错误提示交互</h2>
+<p>错误提示的形式由「错误发生的位置」与「是否可原地重试」共同决定：</p>
+<table><thead><tr><th>类型</th><th>出现方式</th><th>消失方式</th><th>典型用例</th></tr></thead><tbody>
+<tr><td>行内错误</td><td>输入框下方 16px 文字，颜色 <code>#A85A4D</code></td><td>校验通过即消失</td><td>标题为空</td></tr>
+<tr><td>错误块</td><td>在出错区域<strong>原位替换</strong>内容，含原因、下一步动作与重试按钮</td><td>用户重试成功或离开页面</td><td>转写失败、AI 生成失败、导出失败</td></tr>
+<tr><td>Toast</td><td>顶部居中，底色 <code>#EFE4D6</code></td><td>2.5 秒自动消失</td><td>保存成功、记录已删除</td></tr>
+<tr><td>确认弹窗</td><td>模态弹窗，遮罩不可点击关闭</td><td>用户显式选择</td><td>删除记录、重新录制、放弃未保存内容</td></tr>
+</tbody></table>
+<p>错误块中的文案与操作按后端返回的错误码一一对应，可重试的错误码其错误块必须带「重试」按钮：</p>
+<table><thead><tr><th>错误码类别</th><th>错误块标题</th><th>下一步动作入口</th></tr></thead><tbody>
+<tr><td>MYM_1xxx 输入与素材校验</td><td>素材不合规</td><td>重新录制 / 重新选择文件（无重试按钮）</td></tr>
+<tr><td>MYM_2xxx 语音转写</td><td>转写失败</td><td>重试（音频已保存在本地）</td></tr>
+<tr><td>MYM_3xxx AI 生成</td><td>初稿生成失败</td><td>重试（原始转写文本已保留）</td></tr>
+<tr><td>MYM_4xxx 文档导出</td><td>导出失败</td><td>重试（编辑内容未受影响）</td></tr>
+<tr><td>MYM_5xxx 服务与通用</td><td>服务暂时不可用</td><td>重试 / 进入本地模式继续录音与编辑</td></tr>
+</tbody></table>
+<h2>5.7 耗时状态与状态文字</h2>
+<ul>
+<li>录音中、转写中、生成中、保存中、导出中五类耗时状态，必须在 <strong>300ms 内</strong>出现文字提示。</li>
+<li>任何超过 3 秒的操作，都必须显示进度或「正在进行，请稍候」。</li>
+<li>状态文字固定为 16px，位置固定，出现与消失时不得引起页面元素跳动。</li>
+<li>状态必须同时可通过文字识别，不得只用颜色或动画表达（对应无障碍检查项 A4）。</li>
+</ul>
+<h2>5.8 动效清单</h2>
+<table><thead><tr><th>动效</th><th>时长</th><th>曲线</th><th>用途</th></tr></thead><tbody>
+<tr><td>按钮颜色过渡</td><td>120ms</td><td>ease-out</td><td>主按钮 / 次按钮悬停与按下</td></tr>
+<tr><td>卡片底色过渡</td><td>150ms</td><td>ease-out</td><td>记录卡片悬停</td></tr>
+<tr><td>弹窗淡入并上移</td><td>150ms</td><td>cubic-bezier(.2,.8,.2,1)</td><td>弹窗打开与关闭</td></tr>
+<tr><td>Toast 进入 / 退出</td><td>150ms / 120ms</td><td>ease-out</td><td>Toast 出现与消失</td></tr>
+<tr><td>录音呼吸圈</td><td>3s 循环</td><td>ease-in-out</td><td>录音中（<strong>全站唯一循环动效</strong>）</td></tr>
+</tbody></table>
+<div class="note">开启系统「减少动态效果」后：呼吸圈降级为静态描边（状态文案不变），其余过渡时长归零，功能与状态提示完全不受影响。</div>
+
+<h1>6. 页面结构与状态矩阵</h1>
+<h2>6.1 页面清单与业务页面映射</h2>
+<p>本项目共 6 个页面。下表给出它们与业务要求中 4 个业务页面的对应关系 —— 6 屏是同一批业务页面的<strong>更细颗粒度拆分</strong>，未新增任何业务页面。</p>
+<table><thead><tr><th>业务页面</th><th>本项目页面</th><th>拆分理由</th></tr></thead><tbody>
+<tr><td>项目列表页</td><td>P1 首页 / 记录列表</td><td>1:1 对应</td></tr>
+<tr><td>素材录入页</td><td>P2 新建记录 + P3 录音页</td><td>拆为两屏：先为这段回忆命名，再进入录音，避免在同一屏内同时承担命名与录音两件事</td></tr>
+<tr><td>AI 生成编辑页</td><td>P4 转写与初稿页 + P5 在线编辑页</td><td>拆为两屏：把「生成」与「编辑」分开，生成失败时不干扰已编辑的内容</td></tr>
+<tr><td>文档导出页</td><td>P6 导出确认</td><td>1:1 对应（以弹窗呈现）</td></tr>
+</tbody></table>
+<table><thead><tr><th>编号</th><th>页面</th><th>主要操作</th><th>优先级</th></tr></thead><tbody>
+<tr><td>P1</td><td>首页 / 记录列表</td><td>新建口述记录</td><td>P0</td></tr>
+<tr><td>P2</td><td>新建记录</td><td>开始录音</td><td>P0</td></tr>
+<tr><td>P3</td><td>录音页</td><td>开始录音 / 确认录音</td><td>P0</td></tr>
+<tr><td>P4</td><td>转写与初稿页</td><td>开始转写 / 生成初稿</td><td>P0</td></tr>
+<tr><td>P5</td><td>在线编辑页</td><td>保存内容</td><td>P0</td></tr>
+<tr><td>P6</td><td>导出确认</td><td>导出文档</td><td>P0</td></tr>
+</tbody></table>
+<h2>6.2 全局状态</h2>
+<table><thead><tr><th>状态</th><th>出现位置</th><th>呈现形式</th><th>文案</th></tr></thead><tbody>
+<tr><td>服务不可用（后端未启动）</td><td>顶部栏 + P4</td><td>顶部栏显示「本地模式」标签；P4 禁用转写与生成按钮</td><td>当前为本地模式，录音、编辑与导出可正常使用</td></tr>
+<tr><td>加载中</td><td>所有列表与详情</td><td>骨架块（不使用转圈）</td><td>正在加载…</td></tr>
+<tr><td>空数据</td><td>P1 列表</td><td>按 3.8 空态规范</td><td>还没有口述记录，可以先创建一条记录</td></tr>
+</tbody></table>
+<h2>6.3 页面级状态矩阵</h2>
+<table><thead><tr><th>页面</th><th>主要状态</th><th>错误态</th><th>文案要点</th></tr></thead><tbody>
+<tr><td>P1 记录列表</td><td>正常 / 空 / 加载</td><td>本地存储读取失败</td><td>读取本地数据失败，请刷新页面重试</td></tr>
+<tr><td>P2 新建记录</td><td>正常 / 标题为空</td><td>创建失败</td><td>标题为空时提示「请先填写记录标题」</td></tr>
+<tr><td>P3 录音页</td><td>未开始 / 录音中 / 已暂停 / 待确认 / 已确认</td><td>麦克风未授权、录音中断、存储不足</td><td>见 3.2 录音按钮状态表</td></tr>
+<tr><td>P4 转写与初稿</td><td>未转写 / 转写中 / 转写完成 / 润色中 / 润色完成</td><td>转写失败、结果为空、AI 生成失败</td><td>保留原文与音频，提供重试入口</td></tr>
+<tr><td>P5 在线编辑</td><td>编辑中 / 有未保存改动 / 已保存</td><td>保存失败</td><td>保存失败，请稍后重试</td></tr>
+<tr><td>P6 导出确认</td><td>校验中 / 生成中 / 完成</td><td>标题为空、正文为空、存在未保存改动、导出失败</td><td>正在生成文档，请稍候 / 文档已导出，请在下载目录中查看</td></tr>
+</tbody></table>
+
+<h1>7. 老年无障碍规范</h1>
+<h2>7.1 四项硬性适配</h2>
+<p>本项目面向中老年用户，以下四项为硬性要求，任何页面都不得违反：</p>
+<table><thead><tr><th>要求</th><th>本规范的落实</th><th>出处</th></tr></thead><tbody>
+<tr><td>字号偏大</td><td>正文 18px，字号下限 16px，标题 20–32px</td><td>4.2</td></tr>
+<tr><td>按钮尺寸大</td><td>点击区最小 48px，主按钮 56px，录音圆钮 96px</td><td>3.1 / 3.2</td></tr>
+<tr><td>颜色对比度高</td><td>正文 11.81:1，主按钮 4.95:1，全部组合均 ≥4.5:1（图形 ≥3:1）</td><td>2.6</td></tr>
+<tr><td>去除花哨动画</td><td>单次动效 ≤200ms，全站仅 1 处循环动效，且可被系统设置关闭</td><td>5.8</td></tr>
+<tr><td>操作极简</td><td>每页唯一主按钮，单页主流程步数不超过 3 步</td><td>5.1 / 6.3</td></tr>
+<tr><td>提示通俗易懂</td><td>统一「原因 + 下一步动作」句式，不使用技术术语</td><td>3.6</td></tr>
+</tbody></table>
+<h2>7.2 无障碍与可用性检查表</h2>
+<p>以下各项为交付前必须逐条确认的检查项：</p>
+<table><thead><tr><th>编号</th><th>检查项</th><th>判据</th></tr></thead><tbody>
+<tr><td>A1</td><td>点击区尺寸</td><td>所有可点击控件有效高度 ≥48px；录音圆钮直径 96px</td></tr>
+<tr><td>A2</td><td>字号下限</td><td>页面中不存在小于 16px 的文字</td></tr>
+<tr><td>A3</td><td>颜色对比度</td><td>文字与背景对比度 ≥4.5:1；图形与控件边界 ≥3:1</td></tr>
+<tr><td>A4</td><td>状态文字化</td><td>录音中、转写中、保存中、失败四类状态均有文字，不依赖颜色</td></tr>
+<tr><td>A5</td><td>主按钮唯一</td><td>每页主按钮数量 ≤1</td></tr>
+<tr><td>A6</td><td>错误句式</td><td>所有错误信息均包含原因与下一步动作</td></tr>
+<tr><td>A7</td><td>危险操作确认</td><td>删除、重录、放弃未保存内容均有二次确认弹窗</td></tr>
+<tr><td>A8</td><td>键盘可达</td><td>所有操作可通过 Tab 聚焦，聚焦态有可见轮廓</td></tr>
+<tr><td>A9</td><td>焦点不丢失</td><td>弹窗关闭后焦点回到触发元素</td></tr>
+<tr><td>A10</td><td>不依赖动画</td><td>关闭动画后功能与状态提示不受影响</td></tr>
+<tr><td>A11</td><td>不依赖颜色单独表意</td><td>状态标签同时具备文字，语义色不单独承载信息</td></tr>
+<tr><td>A12</td><td>文字可放大</td><td>浏览器缩放至 200% 时布局不破版、不遮挡</td></tr>
+</tbody></table>
+
+<h1>8. 交付与命名约定</h1>
+<h2>8.1 实现约定</h2>
+<ul>
+<li>Token 以 CSS 自定义属性形式写入工程主题层，颜色、字号、间距、圆角、投影均引用 Token，不在组件内写死数值。</li>
+<li>本规范中的按钮、提示条、卡片、弹窗等元素，映射为前端组件目录下的独立组件，命名遵循技术方案第 5 章的命名规范。</li>
+<li>设计稿与示例仅使用假数据，<strong>不得包含任何真实音频或个人内容</strong>。</li>
+<li>实现完成后按第 7.2 节的检查表逐项复核，作为前端验收的前置条件。</li>
+</ul>
+<h2>8.2 本规范的迭代</h2>
+<ul>
+<li>v1.0：确定设计 Token、组件规格、页面布局与状态矩阵（无栅格体系与交互动作体系）。</li>
+<li><strong>v2.0（本稿）</strong>：补齐排版栅格与交互动作两件套，四件套齐全；修正主按钮对比度标注错误；新增错误码与错误提示的对应关系、页面映射表与无障碍检查项 A11、A12。</li>
+<li><strong>v2.0（本稿）</strong>：补齐排版栅格与交互动作两件套，四件套齐全；修正主按钮对比度标注错误；新增错误码与错误提示的对应关系、页面映射表与无障碍检查项 A11、A12；新增附录 A 高保真页面示意。</li>
+<li>后续如需变更，应修订本文档并同步更新版本号，不得在实现中单方面偏离规范。</li>
+</ul>
+
+<h1>附录 A　高保真页面示意</h1>
+<h2>A.1 说明</h2>
+<p>本附录给出 6 个页面的高保真视觉示意，用于直观呈现第 2–5 章定义的四件套（配色 / 组件 / 排版栅格 / 交互动作）在真实页面上的落地效果，可视为四件套的执行样板。</p>
+<p>示意稿仅用于视觉参考，<strong>不具备功能</strong>（不含数据逻辑与接口调用）。实际开发以本规范正文为准；若示意稿与正文出现不一致，以正文为准，并应即时修正示意稿。</p>
+<p>示意的源文件随本交付物一并提供：<code>hifi-P1-记录列表.html</code> 至 <code>hifi-P6-导出确认.html</code>（单文件、零外部依赖，可直接双击打开查看），同名 <code>.png</code> 即下方插图的原始图片。全部示意数据均为虚构，不含任何真实音频或个人内容。</p>
+<h2>A.2 页面清单</h2>
+<table><thead><tr><th>编号</th><th>页面</th><th>对应业务页面</th><th>主要操作</th><th>示意源文件</th></tr></thead><tbody>
+<tr><td>P1</td><td>首页 / 记录列表</td><td>项目列表页</td><td>新建口述记录</td><td><code>hifi-P1-记录列表.html</code></td></tr>
+<tr><td>P2</td><td>新建记录</td><td>素材录入页</td><td>开始录音</td><td><code>hifi-P2-新建记录.html</code></td></tr>
+<tr><td>P3</td><td>录音页</td><td>素材录入页</td><td>开始录音 / 确认录音</td><td><code>hifi-P3-录音页.html</code></td></tr>
+<tr><td>P4</td><td>转写与初稿页</td><td>AI 生成编辑页</td><td>开始转写 / 生成初稿</td><td><code>hifi-P4-转写与初稿.html</code></td></tr>
+<tr><td>P5</td><td>在线编辑页</td><td>AI 生成编辑页</td><td>保存内容</td><td><code>hifi-P5-在线编辑.html</code></td></tr>
+<tr><td>P6</td><td>导出确认</td><td>文档导出页</td><td>导出文档</td><td><code>hifi-P6-导出确认.html</code></td></tr>
+</tbody></table>
+<h2>A.3 页面示意</h2>
+<h3>A.3.1 P1 首页 / 记录列表</h3>
+<p>页面骨架为「顶部栏 64px + 内容区 960px 居中 + 底部动作区 80px」。记录卡片采用 12px 圆角、单档投影与 24px 内边距；状态标签使用 2.4 节的「浅底 + 深字」组合（已保存 / 待转写 / 仅录音）。底部动作区只放唯一主按钮「新建口述记录」，全局页面背景为米白 <code>#F7F1E8</code>，卡片为奶油白 <code>#FDFAF5</code>。</p>
+<img src="高保真/hifi-P1-记录列表.png" alt="P1 首页 / 记录列表 高保真示意">
+<h3>A.3.2 P2 新建记录</h3>
+<p>表单区跨 8 列（632px），避免单行文字过长影响中老年用户阅读。标签置于输入框上方而非用 placeholder 代替；输入框处于聚焦态时边框转主色并加 2px 外发光；右下角实时显示字数计数。页面下方给出三条使用说明，其中关键信息以深色加粗突出。</p>
+<img src="高保真/hifi-P2-新建记录.png" alt="P2 新建记录 高保真示意">
+<h3>A.3.3 P3 录音页</h3>
+<p>录音圆钮直径 96px、外圈 14px 淡陶土色环，置于内容区视觉中心，是全页权重最高的元素。录音中同时显示状态文字「正在录音 · 00:42」与等宽数字实时时长，不依赖动画单独表意。次级操作（暂停 / 结束本段 / 播放 / 重新录制）统一 48px，视觉权重明显低于圆钮；「播放」在本段未录制完成时置灰。底部动作区的「确认录音」保持禁用，对应「未确认音频前不得自动进入转写」的硬约束。</p>
+<img src="高保真/hifi-P3-录音页.png" alt="P3 录音页 高保真示意">
+<h3>A.3.4 P4 转写与初稿页</h3>
+<p>顶部为常驻的失真提示条，用暖琥珀色警示底 + 左侧 4px 竖条实现，不使用红色。转写进度以「进度条 + 文字百分比」双重表达。原始转写文本与 AI 润色文本分为两个独立区块，前者标注「只读 · AI 不可覆盖」，后者标注「AI 生成 · 可编辑」——界面上的分离对应技术方案中两个文本字段的分离存储。</p>
+<img src="高保真/hifi-P4-转写与初稿.png" alt="P4 转写与初稿页 高保真示意">
+<h3>A.3.5 P5 在线编辑页</h3>
+<p>编辑区为纯文本域，页面上直接标注「不提供加粗 / 不提供列表 / 不提供图片」，把「不使用富文本编辑器」这一约束固化到界面中，避免实现阶段误加工具栏。顶部状态标签显示「有未保存改动」，对应 5.2 节的状态文字化要求。</p>
+<img src="高保真/hifi-P5-在线编辑.png" alt="P5 在线编辑页 高保真示意">
+<h3>A.3.6 P6 导出确认</h3>
+<p>以弹窗形式呈现，遮罩为 <code>rgba(61,51,44,.34)</code>，弹窗宽度跨 8 列。摘要区逐行列出标题、正文字数、录音片段、导出格式与预计文件名，让用户在生成前确认导出范围；主按钮位于弹窗底部右侧，符合 4.5 节的主按钮位置约定。</p>
+<img src="高保真/hifi-P6-导出确认.png" alt="P6 导出确认 高保真示意">
+
+<footer class="doc-footer">myMemory UI 设计规范 v2.0｜Vibe-Coding 实验3 交付物③｜依据《技术方案与页面原型规划（人工修改稿）》与《后端模块划分清单》《标准化 API 接口文档》编制</footer>
+</section>
+</body>
+</html>
