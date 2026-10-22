@@ -36,10 +36,10 @@ public static class ErrorCodes
     /// <summary>422 导出正文为空（I04）。</summary>
     public const string ExportBodyEmpty = "MYM_1009";
 
-    /// <summary>422 记录标题为空（POST /api/projects，实验4 新增）。</summary>
+    /// <summary>422 记录标题为空（POST /api/projects，实现阶段新增）。</summary>
     public const string TitleEmpty = "MYM_1010";
 
-    /// <summary>413 记录标题超出长度上限（POST /api/projects，实验4 新增）。</summary>
+    /// <summary>413 记录标题超出长度上限（POST /api/projects，实现阶段新增）。</summary>
     public const string TitleTooLong = "MYM_1011";
 
     /// <summary>400 请求缺少必填字段或格式不正确（通用输入类）。</summary>

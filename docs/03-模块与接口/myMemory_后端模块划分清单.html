@@ -35,7 +35,7 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 </head>
 <body>
 <section class="cover" role="cover">
-  <div class="eyebrow">Vibe-Coding 实验3 · 交付物①</div>
+  <div class="eyebrow">详细设计 · 交付物①</div>
   <h1>myMemory<br>后端模块划分清单</h1>
   <div class="subtitle">口述记录生成传记系统 · 网页微缩版</div>
   <div class="meta">依据：《PRD（人工修改版）》《技术方案与页面原型规划（人工修改稿）》｜阶段：详细设计（模块拆分）</div>
@@ -46,7 +46,7 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 <h1>1. 说明</h1>
 <h2>1.1 文档目的</h2>
 <p>本文档基于《myMemory 口述记录生成传记系统 PRD（人工修改版）》与《myMemory 技术方案与页面原型规划（人工修改稿）》，对系统后端进行<strong>模块拆分</strong>，输出模块清单、各模块职责描述与模块间的职责边界，作为接口设计、编码实现与联调验收的直接依据。</p>
-<p>本文档对应 V 模型中<strong>详细设计</strong>环节的模块拆分部分，与《标准化 API 接口文档》《UI 设计规范 v2.0》共同构成本实验的完整交付。</p>
+<p>本文档对应 V 模型中<strong>详细设计</strong>环节的模块拆分部分，与《标准化 API 接口文档》《UI 设计规范 v2.0》共同构成本阶段的完整交付。</p>
 <h2>1.2 拆分原则</h2>
 <ol>
 <li><strong>职责单一：</strong>每个模块只承担一类工作，模块内部高内聚。</li>
@@ -169,7 +169,7 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 
 <h1>5. 与前序文档的对照</h1>
 <h2>5.1 业务动作的承载层</h2>
-<p>本表用于说明实验指定的业务动作在本项目架构中分别由哪一层承载，以及为什么其中一项不产生后端接口。</p>
+<p>本表用于说明需求指定的业务动作在本项目架构中分别由哪一层承载，以及为什么其中一项不产生后端接口。</p>
 <table><thead><tr><th>业务动作</th><th>承载层</th><th>涉及模块</th><th>说明</th></tr></thead><tbody>
 <tr><td>新建传记项目</td><td>前端本地</td><td>无</td><td>本项目数据本地优先，新建记录是浏览器的本地写入，后端不持久化用户数据，故不产生接口</td></tr>
 <tr><td>上传 / 录入口述素材</td><td>前端采集 + 后端接入</td><td>B01 → B02 → B05</td><td>前端负责录音与本地存储；后端只负责素材校验与转写，不保存音频</td></tr>
@@ -177,8 +177,8 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 <tr><td>导出文档</td><td>后端生成</td><td>B04</td><td>由后端组装 OOXML 生成 DOCX，见技术方案 8.3 决策三</td></tr>
 </tbody></table>
 <div class="note"><strong>说明：</strong>「新建传记项目」不产生后端接口，是本项目「数据本地优先、后端不持久化用户数据」这一既定设计决策的直接结果，并非接口设计遗漏。相反，若为它强行增设后端写入接口，将与技术方案 8.3 决策一相冲突。</div>
-<h2>5.2 与实验2 功能模块的映射</h2>
-<table><thead><tr><th>实验2 功能模块</th><th>承载层</th><th>实验3 后端模块</th></tr></thead><tbody>
+<h2>5.2 与概要设计功能模块的映射</h2>
+<table><thead><tr><th>概要设计功能模块</th><th>承载层</th><th>详细设计后端模块</th></tr></thead><tbody>
 <tr><td>M01 记录管理</td><td>前端本地</td><td>—</td></tr>
 <tr><td>M02 录音录入</td><td>前端本地</td><td>—</td></tr>
 <tr><td>M03 本地存储</td><td>前端本地</td><td>—</td></tr>
@@ -204,7 +204,7 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 <tr><td>符合高内聚低耦合</td><td>符合</td><td>同模块内职责相关，模块间仅通过定义好的载荷传递，不共享状态</td></tr>
 </tbody></table>
 
-<footer class="doc-footer">myMemory 后端模块划分清单｜Vibe-Coding 实验3 交付物①｜依据《PRD（人工修改版）》与《技术方案与页面原型规划（人工修改稿）》编制</footer>
+<footer class="doc-footer">myMemory 后端模块划分清单｜详细设计 · 交付物①｜依据《PRD（人工修改版）》与《技术方案与页面原型规划（人工修改稿）》编制</footer>
 </section>
 </body>
 </html>

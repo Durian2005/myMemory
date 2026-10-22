@@ -231,7 +231,7 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 <tr><td>Safari</td><td>基础支持</td><td>录音格式差异需转换，转写功能可用但需验证</td></tr>
 <tr><td>Firefox</td><td>基础支持</td><td>录音可用，不作为主验证环境</td></tr>
 <tr><td>移动端浏览器</td><td>不承诺</td><td>界面按最小宽度 768px 设计</td></tr>
-<tr><td>后端运行时</td><td>.NET 运行时</td><td>与课程项目既有技术栈一致</td></tr>
+<tr><td>后端运行时</td><td>.NET 运行时</td><td>与既有技术栈一致，降低学习成本</td></tr>
 </tbody></table>
 <h2>6.5 可用性与无障碍</h2>
 <ul>
@@ -336,7 +336,7 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 <tr><td>样式方案</td><td>Tailwind CSS</td><td>统一间距与字号体系，便于落实可访问性尺寸要求</td></tr>
 <tr><td>本地数据库</td><td>IndexedDB（通过轻量封装库访问）</td><td>可存储音频二进制与长文本，容量优于 localStorage</td></tr>
 <tr><td>录音</td><td>浏览器 MediaRecorder</td><td>零额外依赖，符合“语音优先”录入要求</td></tr>
-<tr><td>后端</td><td>ASP.NET Core Minimal API</td><td>与既有课程项目技术栈一致，便于复用经验</td></tr>
+<tr><td>后端</td><td>ASP.NET Core Minimal API</td><td>与既有项目技术栈一致，便于复用经验</td></tr>
 <tr><td>文档导出</td><td>后端生成 OOXML（DOCX）</td><td>无需安装 Office 组件，产物可靠且可编辑</td></tr>
 </tbody></table>
 <h2>8.3 关键决策与取舍</h2>
@@ -349,7 +349,7 @@ code { font-family:Consolas,"Courier New",monospace; background:#f1f4f6; padding
 <p>备选方案：使用浏览器内置语音识别接口，可省去后端与费用，但长音频稳定性差、依赖特定浏览器、且会将音频交给浏览器厂商，不作为第一版主路径，仅作为无后端时的可选降级。</p>
 <h3>决策三：DOCX 导出实现</h3>
 <p>由后端组装 OOXML 并直接生成 DOCX，不依赖 Office 组件与第三方重量级库。</p>
-<p>理由：该方式已在同类课程项目中验证可行；产物可被 Word 与 WPS 正常打开；生成逻辑纯函数化，易测试。</p>
+<p>理由：该方式已在同类项目中验证可行；产物可被 Word 与 WPS 正常打开；生成逻辑纯函数化，易测试。</p>
 <h3>决策四：多段口述的数据形态</h3>
 <p>把单表设计拆分为“记录 + 片段”两级结构，解决多段录音无法用单一音频字段表达的问题。</p>
 <h2>8.4 数据结构设计</h2>

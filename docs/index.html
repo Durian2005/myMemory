@@ -24,6 +24,10 @@ a{color:var(--link);}
 .hero .flow{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);
   padding:18px 24px;box-shadow:var(--shadow);font-size:17px;color:var(--muted);}
 .hero .flow b{color:var(--text);font-weight:600;}
+.hero .origin{margin:14px 0 0;padding:12px 18px;font-size:16px;color:var(--muted);
+  background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--primary);
+  border-radius:var(--r-sm);}
+.hero .origin strong{color:var(--text);font-weight:600;}
 h2{font-size:22px;font-weight:700;margin:44px 0 16px;}
 .card{display:block;text-decoration:none;color:inherit;background:var(--bg);border:1px solid var(--border);
   border-radius:var(--r-md);padding:20px 24px;box-shadow:var(--shadow);margin-bottom:12px;}
@@ -45,10 +49,14 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--border);
 
   <div class="hero">
     <h1>myMemory<br>口述记录生成传记系统</h1>
-    <p class="sub">网页微缩版 · 项目文档与界面稿总览</p>
+    <p class="sub">网页微缩版 · 项目文档、界面稿与可运行源码总览</p>
     <div class="flow">
       <b>录入口述素材</b> → <b>语音转文字</b> → <b>AI 润色生成传记初稿</b> → <b>在线编辑</b> → <b>导出 Word 文档</b>
     </div>
+    <p class="origin">
+      <strong>创意归属</strong>：本项目的选题与产品构思并非作者原创，来自作者的老师给出的题目与启发；
+      本站为作者在该题目下的设计、实现与验证记录。
+    </p>
   </div>
 
   <h2>界面稿</h2>
@@ -94,7 +102,7 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--border);
   <h2>设计文档</h2>
   <a class="card" href="01-PRD/myMemory口述记录生成传记系统_PRD（人工修改版）.html">
     <p class="t">产品需求文档（PRD）</p>
-    <p class="d">实验 1 · 需求分析 —— 产品范围、用户场景、数据结构与页面交互</p>
+    <p class="d">需求分析 —— 产品范围、用户场景、数据结构与页面交互</p>
   </a>
   <a class="card" href="05-业务边界清单/业务边界清单_人工修改版.md">
     <p class="t">业务边界清单（做 / 不做）</p>
@@ -102,7 +110,7 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--border);
   </a>
   <a class="card" href="02-技术方案/myMemory_技术方案与页面原型规划（人工修改稿）.html">
     <p class="t">技术方案与页面原型规划（人工修改稿）</p>
-    <p class="d">实验 2 · 概要设计 —— 架构、技术栈、数据结构、接口、风险与验收标准</p>
+    <p class="d">概要设计 —— 架构、技术栈、数据结构、接口、风险与验收标准</p>
   </a>
   <a class="card" href="02-技术方案/myMemory_技术方案与页面原型规划（AI原稿）.html">
     <p class="t">技术方案（AI 原稿 · 对照）</p>
@@ -110,28 +118,48 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--border);
   </a>
   <a class="card" href="02-技术方案/myMemory_风险预案清单（人工修改稿）.html">
     <p class="t">风险预案清单</p>
-    <p class="d">实验 2 交付物 —— 三类核心风险与专项降级方案</p>
+    <p class="d">概要设计 —— 三类核心风险与专项降级方案</p>
   </a>
   <a class="card" href="03-模块与接口/myMemory_后端模块划分清单.html">
     <p class="t">后端模块划分清单</p>
-    <p class="d">实验 3 · 详细设计 —— 6 个职责单一的后端模块与边界判据</p>
+    <p class="d">详细设计 —— 6 个职责单一的后端模块与边界判据</p>
   </a>
   <a class="card" href="03-模块与接口/myMemory_API接口文档.html">
     <p class="t">标准化 API 接口文档</p>
-    <p class="d">实验 3 · 详细设计 —— 4 个接口的完整契约与 21 个业务错误码</p>
+    <p class="d">详细设计 —— 4 个接口的完整契约与 21 个业务错误码</p>
   </a>
   <a class="card" href="04-UI设计规范/myMemory_UI设计规范_v2.0.html">
     <p class="t">UI 设计规范 v2.0</p>
-    <p class="d">实验 3 · 详细设计 —— 配色 / 组件 / 排版栅格 / 交互四件套，附附录 A 高保真示意</p>
+    <p class="d">详细设计 —— 配色 / 组件 / 排版栅格 / 交互四件套，附附录 A 高保真示意</p>
+  </a>
+
+  <h2>编码实现</h2>
+  <a class="card" href="06-任务看板/myMemory_任务看板_v2.4.html">
+    <p class="t">任务拆解看板 v2.4 <span class="tag">交付物</span></p>
+    <p class="d">A / B / C 三个子任务拆成可验收的卡片，含依赖关系、状态迁移与版本迭代记录</p>
+  </a>
+  <a class="card" href="https://github.com/Durian2005/myMemory/tree/main/docs/07-开发记录">
+    <p class="t">开发过程记录</p>
+    <p class="d">人工初审记录（三张表 + 问题与修复）、五个接口的分支实测结果、使用教程</p>
+  </a>
+  <a class="card" href="https://github.com/Durian2005/myMemory/tree/main/docs/07-开发记录/运行截图">
+    <p class="t">运行验证截图</p>
+    <p class="d">11 张关键状态截图（含空态、校验提示、转写失败可重试、本地模式降级）与一份真实导出的 docx</p>
+  </a>
+  <a class="card" href="https://github.com/Durian2005/myMemory/tree/main/app">
+    <p class="t">可运行源码工程</p>
+    <p class="d">Vue 3 + Vite + Pinia + TypeScript 前端，ASP.NET Core Minimal API 后端，页面与接口同源</p>
   </a>
 
   <div class="note">
-    全部界面稿均为<strong>单文件、零外部依赖</strong>，可直接下载后双击打开，也可在本站点击查看。
+    源码工程与过程记录位于仓库 <code>app/</code> 与 <code>docs/07-开发记录/</code>，
+    本站点只发布 <code>docs/</code>，因此这两项直接跳转到 GitHub 查看。<br>
+    全部界面稿均为<strong>单文件、零外部依赖</strong>，可直接下载后双击打开，也可在本站点击查看；
     稿中数据均为虚构示例，不含任何真实音频或个人内容。
   </div>
 
   <footer>
-    myMemory 口述记录生成传记系统 · 课程实验文档成果 · 本站点已设置 noindex，不参与搜索引擎收录
+    myMemory 口述记录生成传记系统 · 项目文档与实现成果 · 本站点已设置 noindex，不参与搜索引擎收录
   </footer>
 </div>
 </body>

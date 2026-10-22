@@ -5,7 +5,7 @@ import { requestJson } from './http';
 
 /**
  * 新建传记项目（POST /api/projects）。
- * 说明：该接口相对实验3《标准化 API 接口文档》的 I01–I04 属新增接口。
+ * 说明：该接口相对《标准化 API 接口文档》的 I01–I04 属新增接口。
  * 后端只做准入校验与结构规范化，记录的落盘仍由前端写入 IndexedDB（技术方案 8.3 决策一）。
  */
 export async function createProject(title: string): Promise<Story> {
