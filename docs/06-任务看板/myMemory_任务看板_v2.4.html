@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>myMemory 任务拆解看板 v2.4（最终版）</title>
+<style>
+  :root{
+    --bg:#f7f1e8; --card:#fdfaf5; --border:#e3d8cc; --text:#3d332c; --muted:#6e5f54;
+    --primary:#96604b; --primary-soft:#e8d5c6; --hover:#efe4d6;
+    --ok-bg:#e7ebd9; --ok-text:#4f5c2c; --warn-bg:#f5e9d2; --warn-text:#7a5a1e;
+    --danger-bg:#f4ddd8; --danger-text:#8f4438;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:16px;line-height:1.75}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 64px}
+  h1{font-size:30px;margin:0 0 8px;font-weight:700}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 20px}
+  .meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:32px}
+  .chip{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px 14px;font-size:14px;color:var(--muted)}
+  .chip b{color:var(--text);font-weight:500}
+  h2{font-size:20px;margin:36px 0 12px;padding-left:12px;border-left:4px solid var(--primary);font-weight:600}
+  h3{font-size:17px;margin:0 0 6px;font-weight:600}
+  .cols{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .col{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .col__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+             padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .col__name{font-size:16px;font-weight:600}
+  .col__count{font-size:14px;color:var(--muted);background:var(--hover);border-radius:999px;padding:2px 10px}
+  .card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+  .card:last-child{margin-bottom:0}
+  .card__id{font-size:13px;color:var(--primary);font-weight:600;letter-spacing:.3px}
+  .card__title{font-size:15px;font-weight:600;margin:2px 0 6px}
+  .card__desc{font-size:14px;color:var(--muted);margin:0}
+  .card__tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag{font-size:12px;border-radius:4px;padding:2px 8px;background:var(--hover);color:var(--muted)}
+  .tag--ok{background:var(--ok-bg);color:var(--ok-text)}
+  .tag--warn{background:var(--warn-bg);color:var(--warn-text)}
+  .empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 0}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 12px;text-align:left;font-size:14px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:var(--hover);font-weight:600;color:var(--text);white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td code{background:var(--hover);border-radius:4px;padding:1px 6px;font-size:13px}
+  .st{display:inline-block;border-radius:999px;padding:1px 10px;font-size:13px;white-space:nowrap}
+  .st--test{background:var(--warn-bg);color:var(--warn-text)}
+  .st--todo{background:var(--hover);color:var(--muted)}
+  .note{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);
+        border-radius:8px;padding:14px 16px;font-size:14px;color:var(--muted);margin-top:12px}
+  .note b{color:var(--text)}
+  .dep{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-size:14px;color:var(--muted);line-height:2.1}
+  .dep span{color:var(--text);font-weight:500}
+  .arrow{color:var(--primary);margin:0 6px}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;text-align:center}
+  @media (max-width:960px){.cols{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>myMemory 任务拆解看板</h1>
+  <p class="sub">口述记录生成传记系统（网页微缩版）｜依据《技术方案与页面原型规划（人工修改稿）》《后端模块划分清单》《UI 设计规范 v2.0》拆解</p>
+  <div class="meta">
+    <span class="chip">版本 <b>v2.4（最终版）</b></span>
+    <span class="chip">更新日期 <b>2026-10-22</b></span>
+    <span class="chip">看板口径 <b>细粒度垂直切片，一卡一次可独立提交</b></span>
+    <span class="chip">用途 <b>Vibe-Coding 实验4 步骤5 看板状态迭代</b></span>
+  </div>
+
+  <h2>一、看板总览</h2>
+  <p class="sub">状态口径：开发完毕一律进入【待测试】，验收通过后才进【已完成】。本轮所有已开发任务均在待测试列。</p>
+  <div class="cols">
+    <div class="col">
+      <div class="col__head"><span class="col__name">待开发</span><span class="col__count">2</span></div>
+      <div class="card">
+        <div class="card__id">T-05</div>
+        <div class="card__title">多段口述管理</div>
+        <p class="card__desc">同主题追加片段、序号稳定、单段删除后重排并提示重新生成初稿。</p>
+        <div class="card__tags"><span class="tag">依赖 T-02</span><span class="tag">M2</span></div>
+      </div>
+      <div class="card">
+        <div class="card__id">T-06</div>
+        <div class="card__title">隐私提示与一键清除</div>
+        <p class="card__desc">保存范围说明、上传前告知、清除全部本地数据的二次确认。</p>
+        <div class="card__tags"><span class="tag">依赖 T-05</span><span class="tag">M4</span></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col__head"><span class="col__name">开发中</span><span class="col__count">0</span></div>
+      <p class="empty">当前无进行中的任务</p>
+    </div>
+
+    <div class="col">
+      <div class="col__head"><span class="col__name">待测试</span><span class="col__count">6</span></div>
+      <div class="card">
+        <div class="card__id">T-00</div>
+        <div class="card__title">工程初始化与设计 Token</div>
+        <p class="card__desc">前后端最小工程 + 配色/字号/间距 Token + 页面骨架。</p>
+        <div class="card__tags"><span class="tag tag--ok">本轮完成</span><span class="tag">M0</span></div>
+      </div>
+      <div class="card">
+        <div class="card__id">T-01</div>
+        <div class="card__title">新建传记项目（子任务 A）</div>
+        <p class="card__desc">后端 <code>POST /api/projects</code>；前端 P1 列表 + P2 新建；后端不可用时本地兜底。</p>
+        <div class="card__tags"><span class="tag tag--ok">实验4 A</span><span class="tag">M1</span><span class="tag">已返工</span><span class="tag">含降级</span></div>
+      </div>
+      <div class="card">
+        <div class="card__id">T-02</div>
+        <div class="card__title">素材录入与转写（子任务 B）</div>
+        <p class="card__desc">后端 <code>POST /api/transcriptions</code>；前端 P3 录音 + 文字素材。</p>
+        <div class="card__tags"><span class="tag tag--ok">实验4 B</span><span class="tag">M1/M2</span></div>
+      </div>
+      <div class="card">
+        <div class="card__id">T-03</div>
+        <div class="card__title">AI 生成与编辑（子任务 C）</div>
+        <p class="card__desc">后端 <code>POST /api/polish</code>；前端 P4 分栏生成与编辑保存。</p>
+        <div class="card__tags"><span class="tag tag--ok">实验4 C</span><span class="tag">M3</span></div>
+      </div>
+      <div class="card">
+        <div class="card__id">T-04</div>
+        <div class="card__title">DOCX 导出</div>
+        <p class="card__desc">后端 <code>POST /api/exports</code> 打包 OOXML；前端 P6 导出确认弹窗与下载。</p>
+        <div class="card__tags"><span class="tag tag--ok">本轮超额</span><span class="tag">M2 · B04 · I04</span></div>
+      </div>
+      <div class="card">
+        <div class="card__id">T-07</div>
+        <div class="card__title">免安装分发版打包</div>
+        <p class="card__desc">前端产物并入 <code>wwwroot</code>；自带运行时单文件 exe + 一键启动脚本 + 使用说明。</p>
+        <div class="card__tags"><span class="tag tag--ok">本轮超额</span><span class="tag">发布形态</span></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col__head"><span class="col__name">已完成</span><span class="col__count">0</span></div>
+      <p class="empty">待测试通过验收后进入本列</p>
+    </div>
+  </div>
+
+  <h2>二、任务清单与验收要点</h2>
+  <table>
+    <thead>
+      <tr><th>编号</th><th>任务</th><th>对应子任务</th><th>承载层 / 接口 / 页面</th><th>依赖</th><th>状态</th><th>验收要点</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>T-00</td><td>工程初始化与设计 Token</td><td>前置</td>
+        <td><code>web/</code> + <code>server/</code>；tokens.css / base.css</td><td>—</td>
+        <td><span class="st st--test">待测试</span></td>
+        <td>目录与命名符合技术方案 5.3；前端可 build、后端可 run；.gitignore 挡住 node_modules / bin / obj</td>
+      </tr>
+      <tr>
+        <td>T-01</td><td>新建传记项目</td><td>实验4 子任务 A</td>
+        <td>后端 <code>POST /api/projects</code>；前端 P1 记录列表 + P2 新建记录</td><td>T-00</td>
+        <td><span class="st st--test">待测试</span></td>
+        <td>入参/返回/错误码与契约一致；空标题与超长可触发 MYM_1010 / MYM_1011；空列表兜底；无障碍四项达标；<strong>后端不可用时前端走本地兜底创建，仍可录入与编辑</strong></td>
+      </tr>
+      <tr>
+        <td>T-02</td><td>素材录入与转写</td><td>实验4 子任务 B</td>
+        <td>后端 <code>POST /api/transcriptions</code>（I02）；前端 P3 录音 + 文字素材</td><td>T-01</td>
+        <td><span class="st st--test">待测试</span></td>
+        <td>MYM_1001–1005、2001–2003 可触发；单段录音可试听重录；空素材提交被拦截；音频先入库再上传</td>
+      </tr>
+      <tr>
+        <td>T-03</td><td>AI 生成与编辑</td><td>实验4 子任务 C</td>
+        <td>后端 <code>POST /api/polish</code>（I03）；前端 P4 原文只读 + 初稿可编辑</td><td>T-02</td>
+        <td><span class="st st--test">待测试</span></td>
+        <td>原文与初稿分栏且原文不可改；MYM_1006/1007、3001–3004 可触发；初稿可编辑保存并留存 sourceTextHash</td>
+      </tr>
+      <tr>
+        <td>T-04</td><td>DOCX 导出</td><td>本轮超额（对应 I04）</td>
+        <td>后端 <code>POST /api/exports</code>；前端 P6 导出确认弹窗</td><td>T-03</td>
+        <td><span class="st st--test">待测试</span></td>
+        <td>导出文件可被 Word 打开；MYM_1008/1009/4001/4002 可触发；文件名中文不乱码</td>
+      </tr>
+      <tr>
+        <td>T-07</td><td>免安装分发版打包</td><td>本轮超额</td>
+        <td>前端产物 → <code>server/wwwroot</code>；<code>dotnet publish --self-contained</code> 单文件；启动脚本 + 使用说明</td><td>T-04</td>
+        <td><span class="st st--test">待测试</span></td>
+        <td>解压后双击即启动，不需安装 .NET / Node；深链刷新不 404；导出 docx 可打开；使用说明含「暂未接入真实 AI 转写」声明</td>
+      </tr>
+      <tr>
+        <td>T-05</td><td>多段口述管理</td><td>—</td>
+        <td>前端；片段追加 / 删除 / 重排</td><td>T-02</td>
+        <td><span class="st st--todo">待开发</span></td>
+        <td>片段序号稳定；删除后重排并提示重新生成初稿</td>
+      </tr>
+      <tr>
+        <td>T-06</td><td>隐私提示与一键清除</td><td>—</td>
+        <td>前端；保存范围说明 + 清除全部本地数据</td><td>T-05</td>
+        <td><span class="st st--todo">待开发</span></td>
+        <td>删除记录时级联清除音频、原始转写与初稿（级联已实现，隐私提示与一键清除入口待补）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>三、状态迁移记录</h2>
+  <table>
+    <thead>
+      <tr><th>日期</th><th>任务</th><th>迁移</th><th>依据</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2026-10-17</td><td>T-00 工程初始化</td><td>开发中 <span class="arrow">→</span> 待测试</td>
+        <td>前后端骨架可构建运行，Token 与骨架落地</td>
+      </tr>
+      <tr>
+        <td>2026-10-17</td><td>T-01 新建传记项目</td><td>待开发 <span class="arrow">→</span> 开发中 <span class="arrow">→</span> 待测试</td>
+        <td>首轮 AI 生成完成，接口 8 项分支与端到端流程实测通过</td>
+      </tr>
+      <tr>
+        <td>2026-10-22</td><td>看板重构（v1.1 → v2.0）</td><td>粒度重构</td>
+        <td>final 版作业要求按 A/B/C 三个子任务逐个闭环，原 T-01–T-10 里程碑粒度无法对应，拆为 T-00–T-04 主线卡</td>
+      </tr>
+      <tr>
+        <td>2026-10-22</td><td>T-01 新建传记项目</td><td>待测试（返工后仍待测试）</td>
+        <td>人工初审发现 4 处问题：空标题提示无法触发、卡片元信息 14px、状态标签深底白字、错误块缺重试入口；已让 AI 修复并复测</td>
+      </tr>
+      <tr>
+        <td>2026-10-22</td><td>T-02 素材录入与转写</td><td>待开发 <span class="arrow">→</span> 开发中 <span class="arrow">→</span> 待测试</td>
+        <td>I02 六个错误分支实测通过；假麦克风端到端录音→转写打通</td>
+      </tr>
+      <tr>
+        <td>2026-10-22</td><td>T-03 AI 生成与编辑</td><td>待开发 <span class="arrow">→</span> 开发中 <span class="arrow">→</span> 待测试</td>
+        <td>I03 五个分支实测通过；初稿生成、编辑保存、原文只读均验证</td>
+      </tr>
+      <tr>
+        <td>2026-10-22</td><td>T-04 DOCX 导出</td><td>待开发 <span class="arrow">→</span> 开发中 <span class="arrow">→</span> 待测试</td>
+        <td>I04 四个分支实测通过；导出 docx 的 ZIP 与 XML 全部可解析，文件名中文正常</td>
+      </tr>
+      <tr>
+        <td>2026-10-22</td><td>T-01 新建传记项目（降级增强）</td><td>待测试 <span class="arrow">→</span> 待测试</td>
+        <td>补「后端不可用 → 本地兜底创建」：实测关闭后端后仍能新建记录并进入录音页，页面显示「本地模式」</td>
+      </tr>
+      <tr>
+        <td>2026-10-22</td><td>T-07 免安装分发版</td><td>待开发 <span class="arrow">→</span> 开发中 <span class="arrow">→</span> 待测试</td>
+        <td>单文件 exe 48.8 MB；解压到空目录后启动，健康检查 200、首页 200、深链 200、导出 docx 可解析</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>四、依赖关系</h2>
+  <div class="dep">
+    <span>T-00 工程初始化</span> <span class="arrow">→</span> <span>T-01 新建项目</span> <span class="arrow">→</span> <span>T-02 素材录入与转写</span> <span class="arrow">→</span> <span>T-03 AI 生成与编辑</span> <span class="arrow">→</span> <span>T-04 导出</span> <span class="arrow">→</span> <span>T-07 分发版打包</span><br>
+    <span>T-02</span> <span class="arrow">→</span> <span>T-05 多段口述管理</span> <span class="arrow">→</span> <span>T-06 隐私提示与一键清除</span>
+  </div>
+
+  <h2>五、版本迭代记录</h2>
+  <table>
+    <thead>
+      <tr><th>版本</th><th>日期</th><th>变更</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>v1.1</td><td>2026-10-17</td><td>按里程碑 T-01–T-10 拆卡，仅 T-01 完成并迁待测试</td></tr>
+      <tr><td>v2.0</td><td>2026-10-22</td><td>按 final 版作业要求重构为 A/B/C 主线卡，状态口径改为「开发完毕＝待测试」</td></tr>
+      <tr><td>v2.3</td><td>2026-10-22</td><td>补 T-04 导出；T-00–T-04 全部迁待测试</td></tr>
+      <tr><td>v2.4</td><td>2026-10-22</td><td>补 T-07 分发版打包；T-01 验收要点补本地降级；迁移记录补两行</td></tr>
+    </tbody>
+  </table>
+
+  <h2>六、口径说明（与实验3 文档的差异）</h2>
+  <div class="note">
+    <b>1. 新增 <code>POST /api/projects</code>。</b>实验3《后端模块划分清单》5.1 与《API 接口文档》1.3 判定「新建传记项目」为前端本地动作、不产生后端接口；
+    实验4 明确要求该动作具备后端接口，故新增。该接口仍遵守「后端不持久化用户数据」的既定决策：只做准入校验与结构规范化，记录落盘仍由前端写入 IndexedDB。
+    新增错误码 MYM_1010 / 1011 / 1012 接续实验3 编号，两份文档已同步补注。
+  </div>
+  <div class="note">
+    <b>2. 子任务 B、C 不新增接口。</b>素材上传转写复用实验3 的 I02 <code>POST /api/transcriptions</code>；
+    AI 生成复用 I03 <code>POST /api/polish</code>。两者的入参、返回与业务错误码均按实验3 契约实现，未作改写。
+  </div>
+  <div class="note">
+    <b>3. T-04 导出与 T-07 分发版均为超额完成。</b>T-04 对应实验3 的 I04，为形成「录入→生成→导出」完整闭环而补充；
+    T-07 为让项目在别人机器上「解压即用」而增加的发布形态，不属于作业三个子任务范围。
+  </div>
+  <div class="note">
+    <b>4. 外部智能服务的当前状态。</b>转写与生成通过 <code>ISpeechToTextProvider</code> / <code>IGenerationProvider</code> 注入，
+    当前注入的是本地模拟实现（<code>local-stub</code>），链路真实、内容为占位，界面与使用说明中均有标注。
+    接入真实服务时只替换实现类，接口契约与前端无需改动。
+  </div>
+
+  <footer>myMemory 任务拆解看板 v2.4（最终版）｜2026-10-22｜Vibe-Coding 实验4 必交材料</footer>
+</div>
+</body>
+</html>
