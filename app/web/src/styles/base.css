@@ -1,0 +1,267 @@
+@import "./tokens.css";
+
+/* 全局重置与页面骨架（UI 设计规范 4.4 / 4.5） */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.8;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 键盘聚焦轮廓：2px 外发光、偏移 2px（UI 规范 2.5 / 5.2） */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- 页面骨架 ---------- */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-4) var(--content-gutter);
+}
+
+/* ---------- 按钮（UI 规范 3.1 / 5.2） ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-label);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) ease-out, color var(--motion-fast) ease-out;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btn--primary {
+  min-height: 56px;
+  padding: 0 var(--space-3);
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-size: var(--text-button);
+  font-weight: 600;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn--primary:active:not(:disabled) {
+  background: var(--color-primary-active);
+}
+
+.btn--secondary {
+  min-height: 48px;
+  padding: 0 var(--space-2);
+  background: var(--color-bg);
+  border-color: var(--color-border);
+  color: var(--color-link);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+
+.btn--text {
+  min-height: 48px;
+  padding: 0 var(--space-1);
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.btn--text:hover:not(:disabled) {
+  color: var(--color-link);
+  text-decoration: underline;
+}
+
+.btn--danger {
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  background: var(--color-danger);
+  color: var(--color-bg);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+}
+
+.btn--danger:active:not(:disabled) {
+  background: var(--color-danger-active);
+}
+
+/* 危险语义的文字按钮（卡片上的「删除」） */
+.btn--text-danger {
+  color: var(--color-danger);
+}
+
+/* ---------- 表单（UI 规范 3.3 / 5.3） ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: var(--form-span-width);
+}
+
+.field__label {
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.field__control {
+  height: 56px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-body);
+}
+
+.field__control:focus {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.field__control--invalid {
+  border-color: var(--color-danger);
+}
+
+.field__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.field__error {
+  color: var(--color-danger-text);
+  font-size: var(--text-caption);
+}
+
+.field__counter {
+  color: var(--color-text-muted);
+  font-size: var(--text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 状态标签（UI 规范 3.5 / 2.4） ---------- */
+.tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: var(--text-label);
+  white-space: nowrap;
+}
+
+/* ---------- 状态提示（UI 规范 3.6） ---------- */
+.notice {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-label);
+}
+
+.notice__bar {
+  flex: 0 0 4px;
+  border-radius: 2px;
+}
+
+/* 错误块：暖调警示底色 + 左侧 4px 竖条 + 「原因 + 下一步动作」两行
+   （UI 规范 3.6 / 5.6；错误码到错误块标题的对应见 UI 规范 5.6 表） */
+.error-block {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-bg);
+}
+
+.error-block__bar {
+  flex: 0 0 4px;
+  border-radius: 2px;
+  background: var(--color-danger);
+}
+
+.error-block__title {
+  margin: 0;
+  color: var(--color-danger-text);
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.error-block__reason {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--text-label);
+}
+
+/* 错误块内的下一步动作（UI 规范 5.6：错误必须给出可执行的出口） */
+.error-block__action {
+  margin-top: var(--space-2);
+}
+
+/* ---------- 底部动作区（UI 规范 4.5） ---------- */
+.app-action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--actionbar-height);
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+}
+
+/* 卡片区块（UI 规范 3.4） */
+.card {
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-3);
+}
+
+/* 尊重系统「减少动态效果」（UI 规范 5.1 / A10） */
+@media (prefers-reduced-motion: no-preference) {
+  .btn {
+    transition-duration: var(--motion-fast);
+  }
+}

@@ -1,0 +1,23 @@
+# 依赖与构建产物
+node_modules/
+dist/
+bin/
+obj/
+*.user
+
+# 分发版产物：前端构建后由后端托管，属于生成物，不入库
+server/wwwroot/
+release/
+*.zip
+
+# 本地配置与密钥（只提交 appsettings.Example.json）
+appsettings.Local.json
+appsettings.Development.json
+.env
+.env.local
+
+# 日志与临时文件
+*.log
+.vs/
+.idea/
+.vscode/
