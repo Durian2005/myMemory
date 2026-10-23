@@ -159,15 +159,25 @@ export const useStoryStore = defineStore('story', () => {
    * 保存一段录音并立即转写。
    * 顺序很重要：先入库再上传，保证转写失败时音频仍在本地，用户可重试（接口文档 2.2 的降级约定）。
    */
+  /**
+   * 保存一段录音并取得其原始文本。
+   *
+   * 两种来源：
+   * 1. `liveTranscript` 有内容 —— 录音时浏览器已同步识别出文字，直接写入，不再走后端；
+   * 2. 没有内容 —— 回落到后端备用引擎（当前为本地模拟），链路与错误码照旧生效。
+   * 无论哪种，音频都先落本地库，永不因为识别失败而丢录音。
+   */
   async function addAudioSegment(
     audio: Blob,
     durationSeconds: number,
+    liveTranscript?: string | null,
   ): Promise<Segment> {
     const story = currentStory.value;
     if (!story) {
       throw new ApiError('MYM_5001', '记录未加载，请返回列表后重试', false);
     }
 
+    const recognized = (liveTranscript ?? '').trim();
     const segment: Segment = {
       segment_id: createStoryId(),
       story_id: story.story_id,
@@ -176,9 +186,10 @@ export const useStoryStore = defineStore('story', () => {
       audio_mime: audio.type || 'audio/webm',
       audio_duration: durationSeconds,
       audio_blob: audio,
-      transcribed_text: '',
-      status: '待转写',
+      transcribed_text: recognized,
+      status: recognized.length > 0 ? '已转写' : '待转写',
       transcription_error: null,
+      transcription_engine: recognized.length > 0 ? 'browser-webspeech' : null,
       created_at: new Date().toISOString(),
     };
 
@@ -186,7 +197,10 @@ export const useStoryStore = defineStore('story', () => {
     segments.value = [...segments.value, segment];
     await syncStoryMeta();
 
-    await transcribe(segment.segment_id);
+    // 已由浏览器识别出文字就不再打后端；否则走后端备用引擎。
+    if (recognized.length === 0) {
+      await transcribe(segment.segment_id);
+    }
     return segments.value.find((item) => item.segment_id === segment.segment_id) ?? segment;
   }
 
@@ -214,6 +228,7 @@ export const useStoryStore = defineStore('story', () => {
       segment.audio_duration = response.durationSeconds;
       segment.status = '已转写';
       segment.transcription_error = null;
+      segment.transcription_engine = 'server-stub';
     } catch (error) {
       segment.status = '转写失败';
       segment.transcription_error =
@@ -243,6 +258,7 @@ export const useStoryStore = defineStore('story', () => {
       transcribed_text: text.trim(),
       status: '已转写',
       transcription_error: null,
+      transcription_engine: 'manual',
       created_at: new Date().toISOString(),
     };
 

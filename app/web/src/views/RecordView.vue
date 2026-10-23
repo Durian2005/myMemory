@@ -5,6 +5,13 @@ import AppTopBar from '../components/AppTopBar.vue';
 import StatusTag from '../components/StatusTag.vue';
 import { useStoryStore } from '../stores/storyStore';
 import type { Segment } from '../types/segment';
+import {
+  WebSpeechSession,
+  describeWebSpeechError,
+  detectBrowserHint,
+  isWebSpeechSupported,
+  type WebSpeechErrorCode,
+} from '../services/asr/webSpeech';
 import { formatDuration } from '../utils/formatTime';
 import { showToast } from '../utils/useToast';
 
@@ -33,10 +40,23 @@ const errorText = ref('');
 const showTextInput = ref(false);
 const textDraft = ref('');
 
+/* ---- 浏览器语音识别（Web Speech API）相关状态 ---- */
+/** 当前浏览器是否暴露了识别 API。注意 true 不等于能识别，国内 Chrome 会以 network 失败。 */
+const speechSupported = ref(false);
+/** 用户浏览器的粗略名字，仅用于提示文案。 */
+const browserHint = ref('');
+/** 识别过程中的实时字幕（含临时结果）。 */
+const liveText = ref('');
+/** 停止录音后拿到的识别文本，确认入库时随音频一起保存。 */
+const takeTranscript = ref('');
+/** 识别失败的可读说明；有值时说明这段录音将回落到后端备用引擎。 */
+const speechNotice = ref('');
+
 let recorder: MediaRecorder | null = null;
 let stream: MediaStream | null = null;
 let chunks: BlobPart[] = [];
 let timerId: number | undefined;
+let speechSession: WebSpeechSession | null = null;
 
 const segmentUrls = new Map<string, string>();
 
@@ -72,6 +92,9 @@ const primaryLabel = computed(() => {
 });
 
 onMounted(async () => {
+  speechSupported.value = isWebSpeechSupported();
+  browserHint.value = detectBrowserHint();
+
   const ok = await store.loadStoryDetail(storyId.value);
   if (!ok) {
     notFound.value = true;
@@ -94,6 +117,8 @@ function cleanupRecorder(): void {
     window.clearInterval(timerId);
     timerId = undefined;
   }
+  speechSession?.abort();
+  speechSession = null;
   if (recorder && recorder.state !== 'inactive') {
     recorder.stop();
   }
@@ -115,6 +140,9 @@ function pickMimeType(): string {
 
 async function startRecording(): Promise<void> {
   errorText.value = '';
+  takeTranscript.value = '';
+  liveText.value = '';
+  speechNotice.value = '';
 
   if (!navigator.mediaDevices?.getUserMedia) {
     errorText.value = '当前浏览器不支持录音，请改用 Chrome 或 Edge 打开本页面';
@@ -155,12 +183,21 @@ async function startRecording(): Promise<void> {
     takeBlob.value = blob;
     takeUrl.value = URL.createObjectURL(blob);
     takeDuration.value = elapsedSeconds.value;
+
+    // 识别一句话都没拿到时，如实告知会回落到备用引擎，而不是让用户以为识别成功了
+    if (!takeTranscript.value && !speechNotice.value) {
+      speechNotice.value = speechSupported.value
+        ? '这次没有识别出文字，可能是说得太快或环境太吵。确认后会改用备用引擎转写'
+        : '当前浏览器不支持语音识别，确认后会用备用引擎转写';
+    }
+
     state.value = 'stopped';
   };
 
   recorder.start();
   state.value = 'recording';
   elapsedSeconds.value = 0;
+  startSpeechRecognition();
   timerId = window.setInterval(() => {
     if (state.value === 'recording') {
       elapsedSeconds.value += 1;
@@ -168,10 +205,66 @@ async function startRecording(): Promise<void> {
   }, 1000);
 }
 
+/**
+ * 启动浏览器语音识别。与录音并行，识别失败不影响录音本身。
+ *
+ * 之所以要在开始录音时一起启动，是因为 Web Speech 只吃实时麦克风流，
+ * 无法把已经录好的 webm 文件交给它重新识别。
+ */
+function startSpeechRecognition(): void {
+  liveText.value = '';
+  speechNotice.value = '';
+
+  if (!speechSupported.value) {
+    return;
+  }
+
+  speechSession = new WebSpeechSession({
+    onInterim: (text) => {
+      liveText.value = `${takeTranscript.value}${text}`;
+    },
+    onCommit: (text) => {
+      liveText.value = `${takeTranscript.value}${text}`;
+    },
+    onError: (code, message) => {
+      handleSpeechError(code, message);
+    },
+  });
+  speechSession.start();
+}
+
+/**
+ * 收尾一次识别会话，把拿到的文本并入 takeTranscript。
+ * 暂停、结束录音都会调用它；因为 Web Speech 没有 pause，
+ * 只能结束当前会话、恢复时重开一个新会话，所以文本需要自己累积。
+ */
+async function flushSpeech(): Promise<void> {
+  if (!speechSession) {
+    return;
+  }
+  const session = speechSession;
+  speechSession = null;
+  await session.stop();
+  const text = session.text;
+  if (text) {
+    takeTranscript.value = `${takeTranscript.value}${text}`;
+  }
+  liveText.value = takeTranscript.value;
+}
+
+function handleSpeechError(code: WebSpeechErrorCode, message: string): void {
+  // no-speech 是「这一段没说话」，属正常情况，不打扰用户
+  if (code === 'no-speech') {
+    return;
+  }
+  speechNotice.value = `${message || describeWebSpeechError(code)}。这段录音仍会保存，确认后改用备用引擎转写`;
+}
+
 function pauseRecording(): void {
   if (recorder?.state === 'recording') {
     recorder.pause();
     state.value = 'paused';
+    void flushSpeech();
   }
 }
 
@@ -179,15 +272,18 @@ function resumeRecording(): void {
   if (recorder?.state === 'paused') {
     recorder.resume();
     state.value = 'recording';
+    startSpeechRecognition();
   }
 }
 
-function stopRecording(): void {
+async function stopRecording(): Promise<void> {
   errorText.value = '';
   if (timerId !== undefined) {
     window.clearInterval(timerId);
     timerId = undefined;
   }
+  // 先收识别、再停录音：识别需要一点时间把最后一句交出来
+  await flushSpeech();
   if (recorder && recorder.state !== 'inactive') {
     recorder.stop();
   }
@@ -202,6 +298,9 @@ function discardTake(): void {
   takeUrl.value = '';
   takeDuration.value = 0;
   elapsedSeconds.value = 0;
+  takeTranscript.value = '';
+  liveText.value = '';
+  speechNotice.value = '';
   state.value = 'idle';
 }
 
@@ -212,12 +311,16 @@ async function confirmRecording(): Promise<void> {
 
   isSaving.value = true;
   errorText.value = '';
+  const transcript = takeTranscript.value;
+  const usedFallback = transcript.trim().length === 0;
   try {
-    const segment = await store.addAudioSegment(takeBlob.value, takeDuration.value);
+    const segment = await store.addAudioSegment(takeBlob.value, takeDuration.value, transcript);
     if (segment.status === '转写失败') {
       errorText.value = segment.transcription_error ?? '转写失败，可以稍后重试';
+    } else if (usedFallback) {
+      showToast('这段录音已保存，文字由备用引擎生成');
     } else {
-      showToast('这段录音已保存');
+      showToast('这段录音和识别文字都已保存');
     }
     discardTake();
   } catch (error) {
@@ -227,8 +330,33 @@ async function confirmRecording(): Promise<void> {
   }
 }
 
-async function retryTranscribe(segmentId: string): Promise<void> {
-  await store.transcribe(segmentId);
+async function retryTranscribe(segment: Segment): Promise<void> {
+  // 浏览器识别的结果无法对已录好的音频重跑，也不该用备用引擎覆盖真实识别文本
+  if (segment.transcription_engine === 'browser-webspeech') {
+    errorText.value =
+      '这段文字是录音时由浏览器实时识别的，无法对已经录好的音频重新识别。如需纠正，请重新录制这一段。';
+    return;
+  }
+  await store.transcribe(segment.segment_id);
+}
+
+/** 片段上那个按钮该叫什么：浏览器识别的只能重录，备用引擎的可以重试。 */
+function segmentTranscribeLabel(segment: Segment): string {
+  if (segment.transcription_engine === 'browser-webspeech') {
+    return '重新录制';
+  }
+  return segment.status === '转写失败' ? '重试转写' : '重新转写';
+}
+
+/** 如实标注这段文字的来源，避免用户把备用引擎的占位内容当成真实识别。 */
+function segmentEngineLabel(segment: Segment): string {
+  if (segment.transcription_engine === 'browser-webspeech') {
+    return '文字由浏览器在录音时实时识别';
+  }
+  if (segment.transcription_engine === 'server-stub') {
+    return '文字由备用引擎生成，仅供占位';
+  }
+  return '';
 }
 
 async function removeSegment(segment: Segment): Promise<void> {
@@ -275,7 +403,7 @@ function goNext(): void {
   }
 
   if (transcribedCount.value === 0) {
-    errorText.value = '当前素材还没有完成转写，请先点片段上的「重新转写」，或直接填写文字素材';
+    errorText.value = '当前素材还没有可用的文字，请重新录制这一段，或直接填写文字素材';
     return;
   }
 
@@ -351,6 +479,10 @@ function goBack(): void {
                 正在转写，请稍候…
               </p>
 
+              <p v-if="segmentEngineLabel(segment)" class="segment__engine">
+                {{ segmentEngineLabel(segment) }}
+              </p>
+
               <p v-if="segment.transcription_error" class="segment__error">
                 {{ segment.transcription_error }}
               </p>
@@ -360,9 +492,9 @@ function goBack(): void {
                   v-if="segment.kind === 'audio' && segment.status !== '转写中'"
                   type="button"
                   class="btn btn--text"
-                  @click="retryTranscribe(segment.segment_id)"
+                  @click="retryTranscribe(segment)"
                 >
-                  {{ segment.status === '转写失败' ? '重试转写' : '重新转写' }}
+                  {{ segmentTranscribeLabel(segment) }}
                 </button>
                 <button type="button" class="btn btn--text btn--text-danger" @click="removeSegment(segment)">
                   删除
@@ -398,6 +530,29 @@ function goBack(): void {
             {{ formatDuration(state === 'stopped' ? takeDuration : elapsedSeconds) }}
           </p>
           <p class="recorder__hint">{{ recorderHint }}</p>
+
+          <!-- 实时字幕：让用户看得见「确实在识别」 -->
+          <p v-if="state === 'recording' || state === 'paused'" class="recorder__live" aria-live="polite">
+            {{ liveText || '正在听…请开始说话' }}
+          </p>
+
+          <!-- 停止后回显识别结果，确认前可以先核对 -->
+          <div v-if="state === 'stopped'" class="recorder__result">
+            <p v-if="takeTranscript" class="recorder__result-text">{{ takeTranscript }}</p>
+            <p v-if="speechNotice" class="recorder__warn">{{ speechNotice }}</p>
+          </div>
+
+          <p class="recorder__engine">
+            <template v-if="speechSupported">
+              语音识别：本浏览器内置能力<template v-if="browserHint">（{{ browserHint }}）</template>，需要联网
+            </template>
+            <template v-else>
+              语音识别：当前浏览器不支持，录音会改用备用引擎
+            </template>
+          </p>
+          <p class="recorder__privacy">
+            录音和文字只存在这台电脑上。语音识别由浏览器提供的在线服务完成，说话内容会发送给浏览器的服务商。
+          </p>
 
           <div class="recorder__actions">
             <button
@@ -595,6 +750,58 @@ function goBack(): void {
   margin: var(--space-1) 0 0;
   color: var(--color-danger-text);
   font-size: var(--text-label);
+}
+
+/* 片段文字来源标注：字号不低于 14px，避免信息被当装饰忽略 */
+.segment__engine {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-label);
+}
+
+/* 录音中的实时字幕 */
+.recorder__live {
+  min-height: 2.4em;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+  line-height: 1.7;
+  text-align: left;
+  word-break: break-word;
+}
+
+.recorder__result {
+  width: 100%;
+}
+
+.recorder__result-text {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.recorder__warn {
+  margin: var(--space-1) 0 0;
+  color: var(--color-warning-text, #8A6420);
+  font-size: var(--text-label);
+  text-align: left;
+}
+
+/* 引擎与隐私说明：常驻在录音区，避免用户误以为音频只留在本机 */
+.recorder__engine,
+.recorder__privacy {
+  margin: 0;
+  max-width: 34em;
+  color: var(--color-text-muted);
+  font-size: var(--text-label);
+  text-align: center;
+  line-height: 1.6;
 }
 
 .segment__actions {

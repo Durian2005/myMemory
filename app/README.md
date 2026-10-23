@@ -56,13 +56,21 @@ npm run dev
 
 ```
 Services/Providers/Providers.cs
-  ISpeechToTextProvider  ← StubSpeechToTextProvider（本地模拟）
-  IGenerationProvider    ← StubGenerationProvider（本地模拟）
+  ISpeechToTextProvider  ← StubSpeechToTextProvider（后端备用引擎）
+  IGenerationProvider    ← StubGenerationProvider（规则引擎）
 ```
 
-**当前注入的是本地模拟实现**，原因很直接：当前运行环境没有语音识别与大模型的密钥。
-链路是真实的（真上传、真校验、真错误码、真落库），只有「音频变文字」和「文本润色」两步
-用占位内容代替，界面上会明确标注「本地模拟引擎」，不伪装成已接入真实 AI。
+**转写的主路径在浏览器侧**：录音时同步调用 Web Speech API 取得文字，识别结果与音频一起写入本机，
+不再打后端；只有当浏览器不支持、识别失败或一句都没识别出来时，才回落到后端的
+`StubSpeechToTextProvider`。后者的返回是占位文本，只保证上传、校验、错误码、落库、导出这条链路可验证，
+界面上明确标注为「备用引擎」，不伪装成真实识别。
+
+⚠️ Web Speech API 依赖联网，音频会发送给浏览器厂商的在线服务（Edge→微软、Chrome→谷歌），
+因此它是「识别」，不是「本地识别」。国内 Chrome 可能因访问不到其服务而失败，此时自动走备用引擎。
+
+**文本润色当前是规则引擎**：只去填充词、按句读分段，不做任何事实改写，因此不会虚构人物、时间、地点、事件。
+
+两者都可替换为真实服务，替换点就是上面两个接口，路线与取舍见 `docs/08-升级路线/`。
 
 `appsettings.json` 可切换失败分支，用于验证错误码：
 
@@ -103,7 +111,7 @@ myMemory-app/
 └── server/                   后端（ASP.NET Core Minimal API / .NET 9）
     ├── Endpoints/            Health / Project / Transcription / Generation / Export
     ├── Services/             ProjectService、TranscriptionService、GenerationService、DocxExportService
-    ├── Services/Providers/   转写与生成的接口与本地模拟实现
+    ├── Services/Providers/   转写与生成的接口、备用引擎实现
     ├── Models/               DTO、错误码表与文案
     └── Program.cs            监听、CORS、JSON、上传上限、服务注册
 ```

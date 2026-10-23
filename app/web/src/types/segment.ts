@@ -10,6 +10,14 @@ export type SegmentKind = 'audio' | 'text';
 /** 片段状态：待转写 / 转写中 / 已转写 / 转写失败。 */
 export type SegmentStatus = '待转写' | '转写中' | '已转写' | '转写失败';
 
+/**
+ * 这段文字由谁产生。用于在界面上如实标注来源，避免把不同引擎的结果混为一谈。
+ * - browser-webspeech：浏览器语音识别（录音时同步识别，需联网）
+ * - server-stub：后端备用引擎（当前为本地模拟，仅保证链路可用）
+ * - manual：用户自己打字录入
+ */
+export type TranscriptionEngine = 'browser-webspeech' | 'server-stub' | 'manual';
+
 export interface Segment {
   /** 片段唯一标识，由前端生成（UUID），同时作为转写接口的幂等键。 */
   segment_id: string;
@@ -31,6 +39,8 @@ export interface Segment {
   status: SegmentStatus;
   /** 转写失败时的可读原因；成功时为 null。 */
   transcription_error: string | null;
+  /** 这段文字的来源引擎；旧数据可能没有该字段。 */
+  transcription_engine?: TranscriptionEngine | null;
   /** 录入时间（ISO 8601）。 */
   created_at: string;
 }
