@@ -182,12 +182,20 @@ function goHome(): void {
       </div>
 
       <template v-else>
-        <!-- 事实提示条：AI 只做整理，不负责事实 -->
+        <!-- 事实提示条：按当前引擎切换说法，规则引擎不改写事实，不该套用 AI 幻觉提示 -->
         <div class="notice notice--warning">
           <span class="notice__bar"></span>
           <div>
-            <p class="notice__title">AI 生成内容可能存在错误，请核对人物、时间、地点和事件。</p>
-            <p class="notice__text">原始转写文本不会被 AI 修改，可以随时对照。</p>
+            <p class="notice__title">
+              {{ isStubEngine
+                ? '初稿由规则引擎整理，未改写任何事实，可放心逐段核对。'
+                : 'AI 生成内容可能存在错误，请核对人物、时间、地点和事件。' }}
+            </p>
+            <p class="notice__text">
+              {{ isStubEngine
+                ? '原始转写文本单独保存、不会被初稿覆盖，可以随时对照。'
+                : '原始转写文本不会被 AI 修改，可以随时对照。' }}
+            </p>
           </div>
         </div>
 
@@ -210,7 +218,7 @@ function goHome(): void {
         <section class="card">
           <div class="card__head">
             <h2 class="card__title">原始转写文本</h2>
-            <span class="tag tag--neutral">只读 · AI 不可覆盖</span>
+            <span class="tag tag--neutral">只读 · 不可被覆盖</span>
           </div>
           <div class="readonly-box">
             <p v-if="sourceText" class="readonly-box__text">{{ sourceText }}</p>
@@ -223,14 +231,14 @@ function goHome(): void {
         <!-- 初稿：可编辑 -->
         <section class="card">
           <div class="card__head">
-            <h2 class="card__title">AI 初稿（可编辑）</h2>
+            <h2 class="card__title">传记初稿（可编辑）</h2>
             <span class="tag tag--neutral">
-              {{ isStubEngine ? '本地模拟引擎' : 'AI 生成' }} · 可编辑
+              {{ isStubEngine ? '规则引擎整理' : 'AI 生成' }} · 可编辑
             </span>
           </div>
 
           <p v-if="isStubEngine" class="engine-hint">
-            当前初稿由本机模拟引擎生成，用于打通流程；接入真实 AI 服务后内容会由模型重写。
+            当前初稿由规则引擎整理：去掉「嗯、呃、那个」这类口语填充词、收敛标点、按段落排布，不改写任何事实。接入大模型后，内容会由模型重写。
           </p>
 
           <label class="visually-hidden" for="draft-text">初稿正文</label>

@@ -38,7 +38,7 @@ export interface HealthResponse {
     transcription: boolean;
     generation: boolean;
   };
-  /** 附加字段：当前注入的引擎标识（local-stub 表示本地模拟引擎），仅用于界面提示。 */
+  /** 附加字段：当前注入的引擎标识（local-stub 表示后端注入的是规则引擎实现），仅用于界面提示。 */
   engines?: {
     transcription: string;
     generation: string;

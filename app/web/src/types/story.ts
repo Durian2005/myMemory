@@ -11,7 +11,7 @@ export interface Story {
   story_id: string;
   /** 记录或传记标题。 */
   title: string;
-  /** AI 润色后的传记正文，可被用户编辑覆盖。新建时为空白。 */
+  /** 整理后的传记正文，可被用户编辑覆盖。新建时为空白。 */
   polished_text: string;
   /** 记录当前状态。 */
   status: StoryStatus;

@@ -48,7 +48,7 @@ public interface IGenerationProvider
 /// <summary>
 /// 本地模拟转写引擎（开发用，不是业务功能）。
 ///
-/// 为什么需要它：当前环境没有语音识别服务的密钥，但接口契约、参数校验、错误码与页面交互都必须真实验证。
+/// 为什么需要它：实验环境没有语音识别服务的密钥，但接口契约、参数校验、错误码与页面交互都必须真实验证。
 /// 因此这里提供一个可注入的本地实现：链路完全真实（真实上传、真实校验、真实响应），
 /// 只有「把音频变成文字」这一步用占位内容代替。
 ///
@@ -97,8 +97,8 @@ public sealed class StubSpeechToTextProvider : ISpeechToTextProvider
         // 占位文本只说明「收到了多长的音频」，不编造任何人物、时间、地点与事件，
         // 避免把不存在的事实写进用户的传记。
         var seconds = (int)Math.Round(durationSeconds);
-        var text = $"这是本地模拟引擎返回的占位转写内容，对应一段约 {seconds} 秒的口述。"
-                   + "真实语音识别尚未接入，请在这里手动填写你刚才讲述的内容。";
+        var text = $"这段文字由备用引擎生成，是占位内容（对应约 {seconds} 秒的口述）。"
+                   + "本次浏览器的语音识别没有返回结果，可以点「重新录制」再讲一遍，也可以直接在这里手动填写。";
 
         return new SpeechToTextResult(true, string.Empty, text, Name);
     }

@@ -33,7 +33,7 @@ export interface Segment {
   audio_duration: number;
   /** 音频二进制；文字片段为 null。音频保存在本地，不上传留存。 */
   audio_blob: Blob | null;
-  /** 原始转写文本或用户手写的文字素材。写入后 AI 不得覆盖。 */
+  /** 原始转写文本或用户手写的文字素材。写入后不会被初稿覆盖。 */
   transcribed_text: string;
   /** 转写状态。 */
   status: SegmentStatus;
